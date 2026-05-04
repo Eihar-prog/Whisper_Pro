@@ -28,6 +28,9 @@ function initializeEventListeners() {
     handleMainActionClick,
   );
 
+  // Обработчик клика по кнопке выбора файла
+  getElement('select-file-btn').addEventListener('click', selectFileClick);
+
   // Обработчик изменения режима работы (микрофон/файл)
   document.querySelectorAll('input[name="mode"]').forEach((radio) => {
     radio.addEventListener('change', updateModeUI);

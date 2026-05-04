@@ -52,6 +52,9 @@ class AppAPI:
             file_path = file_path_tuple[0]
             duration_raw, size_raw = self.get_file_metadata(file_path)
 
+            if duration_raw == 0:
+                return {"status": "error", "message": "Invalid file"}
+
             return {
                 "status": "success",
                 "file_name": os.path.basename(file_path),

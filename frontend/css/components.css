@@ -164,16 +164,17 @@
 
 /* Название файла */
 .file-name {
-  font-size: 0.875rem; /* text-sm */
-  font-weight: bold;
+  font-size: 1rem; /* text-sm */
+  font-weight: 400;
   color: #e2e8f0; /* text-slate-200 */
-  text-transform: uppercase;
+  /* text-transform: uppercase; */
   letter-spacing: 0.05em; /* tracking-tight */
+  margin-bottom: 0.2rem;
 }
 
 /* Детали файла */
 .file-details {
-  font-size: 0.625rem; /* text-[10px] */
+  font-size: 0.9rem; /* text-[10px] */
   color: #64748b; /* text-slate-500 */
   font-style: italic;
 }
