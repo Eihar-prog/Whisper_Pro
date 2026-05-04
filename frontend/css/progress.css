@@ -1,0 +1,67 @@
+/* Контейнер прогресса */
+.progress-container {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* gap-2 */
+  background-color: rgba(15, 23, 42, 0.5); /* bg-slate-900/50 */
+  padding: 12px; /* p-3 */
+  border-radius: 12px; /* rounded-xl */
+  border: 1px solid rgba(51, 65, 85, 0.5); /* border border-slate-800 */
+}
+
+/* Шапка прогресса */
+.progress-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  padding: 0 4px; /* px-1 */
+}
+
+/* Статус прогресса */
+.progress-status {
+  font-size: 0.625rem; /* text-[10px] */
+  color: #3b82f6; /* text-blue-400 */
+  font-weight: bold;
+  text-transform: uppercase;
+  letter-spacing: 0.1em; /* tracking-widest */
+}
+
+/* Отображение времени */
+.time-display {
+  font-size: 0.6875rem; /* text-[11px] */
+  font-family: monospace; /* font-mono */
+  color: #94a3b8; /* text-slate-400 */
+}
+
+/* Процент прогресса */
+.progress-percent {
+  font-size: 0.875rem; /* text-sm */
+  line-height: 1.25rem;
+  font-family: monospace; /* font-mono */
+  color: #3b82f6; /* text-blue-400 */
+  font-weight: bold;
+}
+
+/* Контейнер прогресс-бара */
+.progress-bar-container {
+  width: 100%;
+  height: 8px; /* h-2 */
+  background-color: #1e293b; /* bg-slate-800 */
+  border-radius: 9999px; /* rounded-full */
+  overflow: hidden;
+  border: 1px solid rgba(148, 163, 184, 0.5); /* border border-slate-700/50 */
+  box-shadow: inset 0 2px 4px 0 rgba(0, 0, 0, 0.05); /* shadow-inner */
+}
+
+/* Сам прогресс-бар */
+.progress-bar {
+  height: 100%;
+  background: linear-gradient(
+    to right,
+    #3b82f6,
+    #22d3ee
+  ); /* bg-gradient-to-r from-blue-500 to-cyan-400 */
+  transition: width 0.3s ease;
+  position: relative;
+  box-shadow: 0 0 10px rgba(59, 130, 246, 0.5); /* shadow-[0_0_10px_rgba(59,130,246,0.5)] */
+}

@@ -1,0 +1,211 @@
+<!doctype html>
+<html lang="ru">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Whisper Desktop</title>
+    <link rel="stylesheet" href="frontend/css/style.css" />
+  </head>
+  <body>
+    <!-- Header Section -->
+    <header class="header">
+      <div>
+        <div class="logo-section">
+          <h1 class="logo-gradient">Whisper Pro</h1>
+          <span class="open-source-badge">Open Source</span>
+        </div>
+        <p class="app-description">Инструмент расшифровки аудио на базе ИИ</p>
+      </div>
+      <div class="status-indicator-container">
+        <span id="status-indicator" class="status-indicator-dot"></span>
+        <div class="flex-col">
+          <span id="status-text" class="status-text">Готов к работе</span>
+          <span id="status-subtext" class="status-subtext">Модель: Base</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="app-container">
+      <!-- Left Sidebar -->
+      <aside class="sidebar">
+        <div class="glass-panel">
+          <h2 class="section-header">Настройки модели</h2>
+
+          <div class="form-field-group">
+            <label class="form-field-label">Модель Whisper</label>
+            <select
+              id="model-select"
+              class="form-select"
+              onchange="simulateModelLoading()"
+            >
+              <option value="tiny">Tiny (самая быстрая)</option>
+              <option value="base" selected>Base (сбалансированная)</option>
+              <option value="small">Small</option>
+              <option value="medium">Medium</option>
+              <option value="large">Large (высокая точность)</option>
+            </select>
+          </div>
+
+          <div class="form-field-group">
+            <label class="form-field-label">Язык (откуда)</label>
+            <select id="lang-select" class="form-select">
+              <option value="auto">Автоопределение</option>
+              <option value="ru">Русский</option>
+              <option value="en">Английский</option>
+              <option value="de">Немецкий</option>
+              <option value="fr">Французский</option>
+            </select>
+          </div>
+
+          <!-- Режим перевода -->
+          <div class="translate-panel" id="translate-panel">
+            <label
+              class="checkbox-container translate font-bold text-slate-300"
+            >
+              <input
+                type="checkbox"
+                id="translate-toggle"
+                onchange="toggleTranslateMode()"
+              />
+              <span class="checkmark"></span>
+              Мгновенный перевод в EN
+            </label>
+            <p class="text-[9px] text-slate-500 mt-2 leading-tight">
+              Диктуйте на любом языке — Whisper выдаст текст сразу на
+              английском.
+            </p>
+          </div>
+
+          <div class="form-field-group">
+            <label class="form-field-label">Горячая клавиша записи</label>
+            <input
+              type="text"
+              id="hotkey-input"
+              placeholder="Напр. Alt+R"
+              class="form-select text-center font-mono tracking-widest"
+            />
+          </div>
+        </div>
+
+        <div class="glass-panel font-medium">
+          <h2 class="section-header">Режим работы</h2>
+
+          <div class="work-mode-container">
+            <label id="mode-mic" class="work-mode-option">
+              <input
+                type="radio"
+                name="mode"
+                value="mic"
+                checked
+                class="hidden"
+                onchange="updateModeUI()"
+              />
+              <div class="mode-icon">🎤</div>
+              <div class="mode-info">
+                <div class="mode-title">Голосовой набор</div>
+                <div class="mode-description">Вставка текста под курсор</div>
+              </div>
+            </label>
+
+            <label id="mode-file" class="work-mode-option">
+              <input
+                type="radio"
+                name="mode"
+                value="file"
+                class="hidden"
+                onchange="updateModeUI()"
+              />
+              <div class="mode-icon mode-icon-file">📂</div>
+              <div class="mode-info">
+                <div class="mode-title">Транскрибация файла</div>
+                <div class="mode-description">Обработка аудиозаписей</div>
+              </div>
+            </label>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="main-content">
+        <div
+          id="file-context"
+          class="glass-panel file-context-container hidden"
+        >
+          <div class="file-info-block">
+            <button id="select-file-btn" class="file-select-button">
+              Выбрать аудиофайл
+            </button>
+            <div class="text-right leading-tight">
+              <div id="filename" class="file-name">Файл не выбран</div>
+              <div id="fileinfo" class="file-details">
+                Длительность: 00:00 | Размер: 0 MB
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="output-panel glass-panel">
+          <div class="output-panel-header">
+            <div class="subtitle-controls-container">
+              <span class="result-label">Результат</span>
+              <div id="subtitle-container" class="hidden">
+                <label class="checkbox-container">
+                  <input type="checkbox" id="subtitle-toggle" />
+                  <span class="checkmark"></span>
+                  Создать субтитры (.srt)
+                </label>
+              </div>
+            </div>
+            <div class="control-buttons-container">
+              <button id="copy-btn" class="control-button">
+                📋 Копировать
+              </button>
+              <button id="save-btn" class="control-button">💾 Сохранить</button>
+            </div>
+          </div>
+          <textarea
+            id="output-text"
+            class="output-textarea custom-scrollbar"
+            placeholder="Здесь появится текст после обработки..."
+          ></textarea>
+        </div>
+
+        <!-- Action Area -->
+        <div class="action-area">
+          <div id="progress-container" class="progress-container hidden">
+            <div class="progress-header">
+              <div class="flex-col">
+                <span id="progress-status" class="progress-status"
+                  >Процесс обработки</span
+                >
+                <span id="time-display" class="time-display"
+                  >00:00 / 00:00</span
+                >
+              </div>
+              <span id="progress-percent" class="progress-percent">0%</span>
+            </div>
+            <div class="progress-bar-container">
+              <div
+                id="progress-bar"
+                class="progress-bar"
+                style="width: 0%"
+              ></div>
+            </div>
+          </div>
+
+          <button id="main-action-btn" class="action-button">
+            Начать запись
+          </button>
+        </div>
+      </main>
+    </div>
+
+    <!-- Подключение JavaScript файлов -->
+    <script src="frontend/js/utils/dom-utils.js"></script>
+    <script src="frontend/js/ui/status-indicator.js"></script>
+    <script src="frontend/js/ui/progress-bar.js"></script>
+    <script src="frontend/js/ui/ui-manager.js"></script>
+    <script src="frontend/js/models/model-manager.js"></script>
+    <script src="frontend/js/app.js"></script>
+  </body>
+</html>

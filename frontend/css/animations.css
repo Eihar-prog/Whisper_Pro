@@ -1,0 +1,16 @@
+/* Анимации */
+@keyframes pulse-yellow {
+  0% {
+    box-shadow: 0 0 0 0 rgba(234, 179, 8, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 8px rgba(234, 179, 8, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(234, 179, 8, 0);
+  }
+}
+
+.status-loading {
+  animation: pulse-yellow 2s infinite;
+}
