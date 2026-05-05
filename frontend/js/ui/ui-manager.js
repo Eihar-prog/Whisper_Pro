@@ -85,3 +85,36 @@ function updateModeUI() {
   // Обновляем классы кнопки в зависимости от режима перевода
   toggleClass(mainBtn, 'is-translate-mode', isTranslate);
 }
+
+const modelSelect = getElement('model-select');
+const langSelect = getElement('lang-select');
+const translateToggle = getElement('translate-toggle');
+const hotkeyInput = getElement('hotkey-input');
+const subtitleToggle = getElement('subtitle-toggle');
+
+/**
+ * Загрузка настроек интерфейса при запуске приложения
+ */
+async function loadSettingsUI() {
+  const config = await pywebview.api.get_config();
+
+  const {
+    model_size,
+    source_language,
+    translate_to_english,
+    hotkey_record,
+    operation_mode,
+    generate_subtitles,
+  } = config;
+
+  modelSelect.value = model_size || 'base';
+  langSelect.value = source_language || 'auto';
+  translateToggle.checked = translate_to_english || false;
+  hotkeyInput.value = hotkey_record || 'Ctrl+Shift+R';
+  document.querySelector(
+    `input[name="mode"][value="${operation_mode}"]`,
+  ).checked = true;
+  subtitleToggle.checked = generate_subtitles || false;
+
+  updateModeUI();
+}

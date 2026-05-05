@@ -1,10 +1,10 @@
 {
-  "model_size": "base",
-  "source_language": "auto",
-  "translate_to_english": false,
-  "hotkey_record": "ctrl+shift+space",
-  "operation_mode": "file",
-  "audio_input_dir": "",
-  "text_output_dir": "",
-  "generate_subtitles": true
+    "model_size": "small",
+    "source_language": "ru",
+    "translate_to_english": false,
+    "hotkey_record": "scroll lock",
+    "operation_mode": "file",
+    "audio_input_dir": "",
+    "text_output_dir": "",
+    "generate_subtitles": false
 }

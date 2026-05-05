@@ -10,29 +10,25 @@ import subprocess
 import json
 
 import py_src.utils.file_operations as file_op
+from py_src.utils.config import ConfigManager
 
 
 class AppAPI:
     def __init__(self):
         """Инициализация API сервисов"""
         self._window = None
-        self.supported_formats = None
+        self.config_manager = ConfigManager()
 
     def set_window(self, window: webview.Window):
         """Привязка окна pywebview к API"""
         if not self._window:
             self._window = window
 
-    # ----------------------------------------------------------------------------
-    #       Выбор файла, получение метаданных
-    # ----------------------------------------------------------------------------
-    # region
-
     # Диалог выбора файла
     def get_file_data(self) -> dict:
         """Выбор аудио/видео файла и возврат данных на фронтенд"""
         try:
-            file_path = file_op.open_file_dialog(self._window, self.supported_formats)
+            file_path = file_op.open_file_dialog(self._window)
             if not file_path:
                 return {}
 
@@ -54,7 +50,16 @@ class AppAPI:
             print(f"Error in open_file_dialog: {e}")
             return {"status": "error", "message": str(e)}
 
-    # endregion
+    # Загрузка прошлых настроек
+    def get_config(self):
+        """Получение настроек приложения"""
+        print("get_config")
+        return self.config_manager.get_all()
+
+    # Установка настройки
+    def set_setting(self, key, value):
+        """Установка настройки"""
+        self.config_manager.set(key, value)
 
     def get_status(self):
         """Получение текущего статуса приложения"""

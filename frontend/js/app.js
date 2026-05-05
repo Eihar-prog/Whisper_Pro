@@ -16,6 +16,9 @@
 // Документ готов к взаимодействию
 document.addEventListener('DOMContentLoaded', function () {
   initializeEventListeners();
+  window.addEventListener('pywebviewready', () => {
+    initializeApp();
+  });
 });
 
 /**
@@ -66,9 +69,5 @@ function handleMainActionClick() {
  * Инициализация приложения при полной загрузке
  */
 function initializeApp() {
-  updateModeUI(); // Устанавливаем начальное состояние UI
   loadSettingsUI();
 }
-
-// Запускаем инициализацию при загрузке окна
-window.onload = initializeApp;

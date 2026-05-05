@@ -8,12 +8,11 @@ from pathlib import Path
 import subprocess
 import webview
 
-# Форматы поддерживаемых расширений
-audio_extensions = "*.mp3;*.ogg;*.flac;*.wav;*.m4a;*.opus;*.aac"
-video_extensions = "*.mp4;*.mkv;*.avi;*.mov;*.wmv;*.webm;*.flv;*.m4v;*.3gp"
-
 # Путь к ffprobe
 ffprobe_path = Path(__file__).parents[2] / "ffmpeg" / "bin" / "ffprobe.exe"
+
+#  Путь к json файлу поддерживаемых форматов
+supported_formats_path = Path(__file__).parents[2] / "supported_formats.json"
 
 
 def save_text_file(text, file_path, encoding="utf-8"):
@@ -40,7 +39,7 @@ def load_supported_formats(json_path: str = "supported_formats.json") -> dict:
 
 # Диалог выбора файла
 def open_file_dialog(
-    window: webview.Window, formats_json_path: str = "supported_formats.json"
+    window: webview.Window, formats_json_path=supported_formats_path
 ) -> str | None:
     """Открыть диалог выбора файла с фильтрацией из JSON"""
     formats = load_supported_formats(formats_json_path)
