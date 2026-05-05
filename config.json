@@ -1,5 +1,5 @@
 {
-    "model_size": "small",
+    "model_size": "large",
     "source_language": "ru",
     "translate_to_english": false,
     "hotkey_record": "scroll lock",

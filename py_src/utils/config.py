@@ -65,7 +65,7 @@ class ConfigManager:
         return self.data.get(key, default)
 
     #  Получение всех настроек
-    def get_all(self):
+    def get_all(self) -> dict:
         """Получить все настройки"""
         return self.data
 

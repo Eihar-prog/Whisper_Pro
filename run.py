@@ -29,6 +29,7 @@ def setup_webview() -> webview.Window:
         height=825,
         min_size=(950, 825),
         background_color="#0F172A",
+        confirm_close=False,
     )
 
     return window
@@ -40,6 +41,9 @@ def main():
     window = setup_webview()
     window._js_api = api
     api.set_window(window)
+
+    # window.events.closing += api.save_config
+
     webview.start(debug=False)
 
 

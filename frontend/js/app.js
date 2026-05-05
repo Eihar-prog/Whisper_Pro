@@ -15,9 +15,8 @@
 
 // Документ готов к взаимодействию
 document.addEventListener('DOMContentLoaded', function () {
-  initializeEventListeners();
   window.addEventListener('pywebviewready', () => {
-    initializeApp();
+    initializeEventListeners();
   });
 });
 
@@ -25,6 +24,9 @@ document.addEventListener('DOMContentLoaded', function () {
  * Инициализация обработчиков событий
  */
 function initializeEventListeners() {
+  // Загрузка настроек из файла настроек
+  loadSettingsUI();
+
   // Обработчик клика по основной кнопке действия
   getElement('main-action-btn').addEventListener(
     'click',
@@ -46,7 +48,7 @@ function initializeEventListeners() {
   );
 
   // Обработчик изменения модели
-  getElement('model-select').addEventListener('change', simulateModelLoading);
+  getElement('model-select').addEventListener('change', selectModelChange);
 }
 
 /**
@@ -63,11 +65,4 @@ function handleMainActionClick() {
     // Останавливаем анимацию прогресса
     stopProgressAnimation();
   }
-}
-
-/**
- * Инициализация приложения при полной загрузке
- */
-function initializeApp() {
-  loadSettingsUI();
 }

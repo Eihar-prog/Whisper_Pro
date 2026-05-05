@@ -51,15 +51,19 @@ class AppAPI:
             return {"status": "error", "message": str(e)}
 
     # Загрузка прошлых настроек
-    def get_config(self):
-        """Получение настроек приложения"""
-        print("get_config")
-        return self.config_manager.get_all()
+    def load_config(self) -> dict:
+        """Загрузка настроек приложения"""
+        return self.config_manager.load()
 
     # Установка настройки
-    def set_setting(self, key, value):
+    def set_setting(self, key, value) -> dict:
         """Установка настройки"""
         self.config_manager.set(key, value)
+
+    # Сохраняем настройки в файл
+    def save_config(self):
+        """Сохранение настроек в файл"""
+        self.config_manager.save()
 
     def get_status(self):
         """Получение текущего статуса приложения"""

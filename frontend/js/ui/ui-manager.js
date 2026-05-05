@@ -96,7 +96,7 @@ const subtitleToggle = getElement('subtitle-toggle');
  * Загрузка настроек интерфейса при запуске приложения
  */
 async function loadSettingsUI() {
-  const config = await pywebview.api.get_config();
+  const config = await pywebview.api.load_config();
 
   const {
     model_size,
@@ -117,4 +117,15 @@ async function loadSettingsUI() {
   subtitleToggle.checked = generate_subtitles || false;
 
   updateModeUI();
+}
+
+/**
+ * Действие при выборе модели whisper
+ */
+async function selectModelChange() {
+  await pywebview.api.set_setting('model_size', modelSelect.value);
+  await pywebview.api.save_config();
+
+  // Симуляция загрузки модели
+  simulateModelLoading();
 }
