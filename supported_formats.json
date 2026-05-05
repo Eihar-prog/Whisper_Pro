@@ -1,0 +1,23 @@
+{
+  "audio": {
+    "extensions": [
+      ".mp3",
+      ".wav",
+      ".flac",
+      ".m4a",
+      ".ogg"
+    ],
+    "filter": "Audio files"
+  },
+
+  "video": {
+    "extensions": [
+      ".mp4",
+      ".mkv",
+      ".avi",
+      ".mov",
+      ".webm"
+    ],
+    "filter": "Video files"
+  }
+}

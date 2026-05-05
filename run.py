@@ -15,6 +15,9 @@ sys.stdout.reconfigure(encoding="utf-8")
 # Путь к html файлу
 html_file_path = str(Path(__file__).parent / "index.html")
 
+#  Путь к json файлу поддерживаемых форматов
+supported_formats = str(Path(__file__).parent / "supported_formats.json")
+
 
 def setup_webview() -> webview.Window:
     """Настройка параметров окна pywebview"""
@@ -36,6 +39,7 @@ def main():
     window = setup_webview()
     window._js_api = api
     api.set_window(window)
+    api.supported_formats = supported_formats
     webview.start(debug=False)
 
 

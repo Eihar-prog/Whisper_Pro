@@ -11,7 +11,7 @@ let isValidFile = false;
  */
 async function selectFileClick() {
   // 1. Вызываем Python-метод
-  const response = await pywebview.api.open_file_dialog();
+  const response = await pywebview.api.get_file_data();
 
   // 2. Обновляем элементы на форме
   const fileName = document.getElementById('filename');
