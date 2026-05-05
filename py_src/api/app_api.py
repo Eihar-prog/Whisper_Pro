@@ -9,6 +9,8 @@ import webview
 import subprocess
 import json
 
+# from project_root.py_src.utils.config import ConfigAPI
+
 # Форматы поддерживаемых расширений
 audio_extensions = "*.mp3;*.ogg;*.flac;*.wav;*.m4a;*.opus;*.aac"
 video_extensions = "*.mp4;*.mkv;*.avi;*.mov;*.wmv;*.webm;*.flv;*.m4v;*.3gp"
@@ -34,7 +36,7 @@ class AppAPI:
         """Выбор аудио/видео файла и возврат данных на фронтенд"""
         file_types = (
             f"Audio files ({audio_extensions})",
-            f"Video files ({video_extensions})",  # Добавил скобки для красоты
+            f"Video files ({video_extensions})",
             "All files (*.*)",
         )
 

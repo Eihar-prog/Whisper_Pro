@@ -7,17 +7,13 @@ import sys
 import webview
 from pathlib import Path
 
-# Добавление пути к корню проекта в sys.path
-project_root = Path(__file__).parent
-sys.path.insert(0, str(project_root))
-
 from py_src.api.app_api import AppAPI
 
 # Установка UTF-8 для корректного вывода кириллицы в консоль Windows.
 sys.stdout.reconfigure(encoding="utf-8")
 
 # Путь к html файлу
-html_file_path = str(project_root / "index.html")
+html_file_path = str(Path(__file__).parent / "index.html")
 
 
 def setup_webview() -> webview.Window:

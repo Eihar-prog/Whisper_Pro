@@ -1,7 +1,6 @@
 # 🔇 Тяжёлые файлы и папки — не коммитим
-/models/
+/ai_models/
 /ffmpeg/
-/runtime/
 
 # 🐍 Python
 __pycache__/
@@ -11,6 +10,7 @@ __pycache__/
 .Python
 env/
 venv/
+.venv/
 *.egg-info/
 *.egg
 .pytest_cache/

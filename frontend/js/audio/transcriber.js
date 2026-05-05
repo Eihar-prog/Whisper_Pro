@@ -25,6 +25,7 @@ async function selectFileClick() {
 
     console.log('Путь к файлу сохранен:', response.file_path);
   } else if (response.status === 'error') {
+    isValidFile = false;
     fileName.textContent = response.message;
     console.log('Ошибка при выборе файла:', response.message);
   }

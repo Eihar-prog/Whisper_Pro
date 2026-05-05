@@ -3,6 +3,15 @@
 Сохранение, чтение, форматирование
 """
 
+from pathlib import Path
+
+# Форматы поддерживаемых расширений
+audio_extensions = "*.mp3;*.ogg;*.flac;*.wav;*.m4a;*.opus;*.aac"
+video_extensions = "*.mp4;*.mkv;*.avi;*.mov;*.wmv;*.webm;*.flv;*.m4v;*.3gp"
+
+# Путь к ffprobe
+ffprobe_path = Path(__file__).parents[2] / "ffmpeg" / "bin" / "ffprobe.exe"
+
 
 def save_text_file(text, file_path, encoding="utf-8"):
     """Сохранить текст в файл"""

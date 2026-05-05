@@ -67,6 +67,7 @@ function handleMainActionClick() {
  */
 function initializeApp() {
   updateModeUI(); // Устанавливаем начальное состояние UI
+  loadSettingsUI();
 }
 
 // Запускаем инициализацию при загрузке окна
