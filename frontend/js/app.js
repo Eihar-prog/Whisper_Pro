@@ -1,10 +1,10 @@
 /**
  * @typedef {import('./utils/dom-utils.js').getElement} getElement
- * @typedef {import('./ui/ui-manager.js').updateModeUI} updateModeUI
- * @typedef {import('./ui/ui-manager.js').toggleTranslateMode} toggleTranslateMode
- * @typedef {import('./models/model-manager.js').simulateModelLoading} simulateModelLoading
- * @typedef {import('./ui/progress-bar.js').startProgressAnimation} startProgressAnimation
- * @typedef {import('./ui/progress-bar.js').stopProgressAnimation} stopProgressAnimation
+ * @typedef {import('./ui/ui-manager.js').updateModeUI}
+ * @typedef {import('./ui/ui-manager.js').toggleTranslateMode}
+ * @typedef {import('./models/model-manager.js').simulateModelLoading}
+ * @typedef {import('./ui/progress-bar.js').startProgressAnimation}
+ * @typedef {import('./ui/progress-bar.js').stopProgressAnimation}
  */
 
 /**
@@ -33,22 +33,37 @@ function initializeEventListeners() {
     handleMainActionClick,
   );
 
+  // Обработчик включения/выключения субтитров
+  getElement('subtitle-toggle').addEventListener('change', changeSubtitles);
+
   // Обработчик клика по кнопке выбора файла
   getElement('select-file-btn').addEventListener('click', selectFileClick);
 
   // Обработчик изменения режима работы (микрофон/файл)
   document.querySelectorAll('input[name="mode"]').forEach((radio) => {
-    radio.addEventListener('change', updateModeUI);
+    radio.addEventListener('change', (event) => changeMode(event));
   });
 
   // Обработчик изменения режима перевода
   getElement('translate-toggle').addEventListener(
     'change',
-    toggleTranslateMode,
+    toggleTranslateChange,
   );
 
   // Обработчик изменения модели
   getElement('model-select').addEventListener('change', selectModelChange);
+
+  // Обработчик выбора языка для модели
+  getElement('lang-select').addEventListener('change', selectLangChange);
+
+  // Обработчик смены горячих клавиш
+  getElement('hotkey-input').addEventListener('change', hotkeyChange);
+
+  // Обработчик кнопки "Копировать"
+  getElement('copy-btn').addEventListener('click', copyBtnClick);
+
+  // Обработчик кнопки "Сохранить"
+  getElement('save-btn').addEventListener('click', saveBtnClick);
 }
 
 /**

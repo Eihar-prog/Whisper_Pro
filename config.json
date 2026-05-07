@@ -1,10 +1,10 @@
 {
-    "model_size": "large",
-    "source_language": "ru",
+    "model_size": "small",
+    "source_language": "auto",
     "translate_to_english": false,
-    "hotkey_record": "scroll lock",
+    "hotkey_record": "ctrl+shift+space",
     "operation_mode": "file",
-    "audio_input_dir": "",
-    "text_output_dir": "",
-    "generate_subtitles": false
+    "audio_input_dir": "M:\\Музыка",
+    "text_output_dir": "C:\\Users",
+    "generate_subtitles": true
 }

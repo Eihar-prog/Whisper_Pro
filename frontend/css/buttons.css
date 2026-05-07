@@ -65,7 +65,8 @@
 }
 
 .control-button:hover {
-  background-color: rgba(30, 41, 59, 0.5); /* hover:bg-slate-700/50 */
+  background-color: #1e293b; /* hover:bg-slate-700/50 */
+  /* border-color:  */
 }
 
 /* Кнопка выбора файла */

@@ -24,13 +24,20 @@ class AppAPI:
         if not self._window:
             self._window = window
 
-    # Диалог выбора файла
+    # Получение метаданных аудиофайла
     def get_file_data(self) -> dict:
         """Выбор аудио/видео файла и возврат данных на фронтенд"""
         try:
-            file_path = file_op.open_file_dialog(self._window)
+            input_dir = self.config_manager.get("audio_input_dir")
+            file_path = file_op.open_file_dialog(self._window, input_dir)
             if not file_path:
                 return {}
+
+            # Добавляем путь к папке с аудио в config файл
+            directory = str(Path(file_path).parent)
+            if input_dir != directory:  # Если папка не совпадает с предыдущей
+                self.config_manager.set("audio_input_dir", directory)
+                self.config_manager.save()
 
             # Получение метаданных файла
             duration_raw, size_raw = file_op.get_file_metadata(file_path)
@@ -49,6 +56,22 @@ class AppAPI:
         except Exception as e:
             print(f"Error in open_file_dialog: {e}")
             return {"status": "error", "message": str(e)}
+
+    # Сохранение текста в файл
+    def save_text(self, text: str, is_subtitle_file=False) -> str | None:
+        """Сохранение текста в файл"""
+        output_dir = self.config_manager.get("text_output_dir")
+        file_path = file_op.save_file_dialog(self._window, output_dir, is_subtitle_file)
+        if not file_path:
+            return
+
+        file_op.save_text_file(text, file_path)
+        directory = str(Path(file_path).parent)
+        if output_dir != directory:  # Если папка не совпадает с предыдущей
+            self.config_manager.set("text_output_dir", directory)
+            self.config_manager.save()
+
+        return file_path
 
     # Загрузка прошлых настроек
     def load_config(self) -> dict:

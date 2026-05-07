@@ -15,9 +15,20 @@ ffprobe_path = Path(__file__).parents[2] / "ffmpeg" / "bin" / "ffprobe.exe"
 supported_formats_path = Path(__file__).parents[2] / "supported_formats.json"
 
 
+# Сохранение текста в файл
 def save_text_file(text, file_path, encoding="utf-8"):
     """Сохранить текст в файл"""
-    pass
+    try:
+        with open(file_path, "w", encoding=encoding) as f:
+            f.write(text)
+        print(f"✅ Файл сохранён: {file_path}")
+        return True
+    except PermissionError:
+        print(f"❌ Нет прав на запись: {file_path}")
+        return False
+    except OSError as e:
+        print(f"❌ Ошибка при сохранении: {e}")
+        return False
 
 
 def save_subtitle_file(text, file_path):
@@ -30,6 +41,29 @@ def validate_audio_file(file_path):
     pass
 
 
+#  Диалог сохранения файла
+def save_file_dialog(
+    window: webview.Window, output_dir="/", is_subtitle_file=False
+) -> str | None:
+    """Открыть диалог сохранения файла"""
+    result = window.create_file_dialog(
+        webview.FileDialog.SAVE,
+        directory=output_dir,
+        save_filename="output.srt" if is_subtitle_file else "output.txt",
+        file_types=(
+            ("SubRip Subtitle (*.srt)",) if is_subtitle_file else ("Text file (*.txt)",)
+        ),
+    )
+
+    if result:
+        save_path = result[0]
+        print(f"Saved to {save_path}")
+        return save_path
+
+    print("User cancelled save dialog")
+    return None
+
+
 # Загрузка поддерживаемых форматов
 def load_supported_formats(json_path: str = "supported_formats.json") -> dict:
     """Загрузить поддерживаемые форматы из JSON файла"""
@@ -39,7 +73,9 @@ def load_supported_formats(json_path: str = "supported_formats.json") -> dict:
 
 # Диалог выбора файла
 def open_file_dialog(
-    window: webview.Window, formats_json_path=supported_formats_path
+    window: webview.Window,
+    input_dir: str,
+    formats_json_path=supported_formats_path,
 ) -> str | None:
     """Открыть диалог выбора файла с фильтрацией из JSON"""
     formats = load_supported_formats(formats_json_path)
@@ -63,6 +99,7 @@ def open_file_dialog(
 
     file_path_tuple = window.create_file_dialog(
         webview.FileDialog.OPEN,
+        directory=input_dir,
         allow_multiple=False,
         file_types=file_types,
     )
