@@ -16,7 +16,7 @@ class ConfigManager:
 
         # Дефолтные настройки (на случай, если файла нет или он битый)
         self.defaults = {
-            "model_size": "base",
+            "model_size": "",
             "source_language": "auto",
             "translate_to_english": False,
             "hotkey_record": "ctrl+shift+space",

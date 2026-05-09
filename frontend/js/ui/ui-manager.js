@@ -107,7 +107,7 @@ async function loadSettingsUI() {
     generate_subtitles,
   } = config;
 
-  modelSelect.value = model_size || 'base';
+  modelSelect.value = model_size || '';
   langSelect.value = source_language || 'auto';
   translateToggle.checked = translate_to_english || false;
   hotkeyInput.value = hotkey_record || 'Ctrl+Shift+R';
@@ -125,9 +125,8 @@ async function loadSettingsUI() {
 async function selectModelChange() {
   await pywebview.api.set_setting('model_size', modelSelect.value);
   await pywebview.api.save_config();
-
-  // Симуляция загрузки модели
-  simulateModelLoading();
+  // загрузка модели whisper и опрос состояния
+  loadWhisperModel();
 }
 
 /**

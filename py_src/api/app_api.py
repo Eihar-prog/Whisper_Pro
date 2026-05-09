@@ -8,21 +8,94 @@ from pathlib import Path
 import webview
 import subprocess
 import json
+import threading
 
 import py_src.utils.file_operations as file_op
 from py_src.utils.config import ConfigManager
+from py_src.core.model_manager import ModelManager
+from py_src.core.transcriber import WhisperTranscriber
 
 
 class AppAPI:
     def __init__(self):
         """Инициализация API сервисов"""
-        self._window = None
+        self._window: webview.Window = None
         self.config_manager = ConfigManager()
+        self.model_manager = ModelManager()
+        self.transcriber = WhisperTranscriber(self.model_manager)
 
-    def set_window(self, window: webview.Window):
-        """Привязка окна pywebview к API"""
-        if not self._window:
-            self._window = window
+    def set_window(self, window: webview.Window) -> None:
+        """Установка ссылки на окно pywebview для диалогов и событий"""
+        self._window = window
+
+    # --- Управление транскрибацией ---
+
+    def start_transcription(self, file_path: str) -> dict[str, str]:
+        """
+        Запуск процесса расшифровки в отдельном потоке.
+        """
+        if not self.model_manager.model:
+            return {"status": "error", "message": "Модель не загружена"}
+
+        config = self.config_manager.get_all()
+        language = config.get("source_language", "auto")
+
+        # Запускаем в потоке-демоне, чтобы не блокировать UI и корректно завершать приложение
+        thread = threading.Thread(
+            target=self._run_transcription_loop, args=(file_path, language), daemon=True
+        )
+        thread.start()
+
+        return {"status": "started"}
+
+    def _run_transcription_loop(self, file_path: str, language: str):
+        """Внутренний цикл перебора сегментов и отправки их в JS"""
+        try:
+            # Получаем генератор из транскрибатора
+            segments_generator = self.transcriber.transcribe(
+                file_path=file_path, language=language
+            )
+
+            for segment in segments_generator:
+                # Кодируем сегмент в JSON для безопасной передачи в JS
+                segment_json = json.dumps(segment, ensure_ascii=False)
+
+                # Вызываем JS-функцию handleNewSegment на фронтенде
+                if self._window:
+                    self._window.evaluate_js(f"handleNewSegment({segment_json})")
+
+            # Сообщаем JS, что всё закончилось
+            if self._window:
+                self._window.evaluate_js("handleTranscriptionEnd()")
+
+        except Exception as e:
+            print(f"Ошибка в цикле транскрибации: {e}")
+            if self._window:
+                self._window.evaluate_js(f"console.error('Transcription error: {e}')")
+
+    # --- Методы управления моделью ---
+
+    def load_whisper_model(self) -> dict[str, str]:
+        """
+        Загружает модель, используя параметры из конфига.
+        Вызывается из JS при смене модели или старте.
+        """
+        config = self.config_manager.get_all()
+        model_size = config.get("model_size", "")
+
+        if not model_size:
+            return {"status": "error", "message": "Модель не выбрана"}
+
+        # Запускаем загрузку (внутри ModelManager она уйдет в поток)
+        self.model_manager.load_model(model_size=model_size)
+        return {"status": "started", "model": model_size}
+
+    def get_model_status(self) -> dict[str, any]:
+        """
+        Метод для 'пинг-понга'. JS вызывает его через setInterval,
+        чтобы обновлять индикатор статуса и прогрессбар загрузки.
+        """
+        return self.model_manager.get_status()
 
     # Получение метаданных аудиофайла
     def get_file_data(self) -> dict:
@@ -73,28 +146,32 @@ class AppAPI:
 
         return file_path
 
-    # Загрузка прошлых настроек
-    def load_config(self) -> dict:
-        """Загрузка настроек приложения"""
-        return self.config_manager.load()
+    # --- Методы работы с конфигурацией (нужны для ui-manager.js) ---
 
-    # Установка настройки
-    def set_setting(self, key, value) -> dict:
-        """Установка настройки"""
-        self.config_manager.set(key, value)
+    def load_config(self) -> dict[str, any]:
+        """Возвращает все текущие настройки приложения"""
+        return self.config_manager.get_all()
 
-    # Сохраняем настройки в файл
-    def save_config(self):
-        """Сохранение настроек в файл"""
-        self.config_manager.save()
+    def set_setting(self, key: str, value: any) -> bool:
+        """Устанавливает конкретный параметр в памяти"""
+        try:
+            self.config_manager.set(key, value)
+            return True
+        except Exception:
+            return False
 
-    def get_status(self):
-        """Получение текущего статуса приложения"""
-        pass
+    def save_config(self) -> bool:
+        """Физически записывает настройки из памяти в config.json"""
+        return self.config_manager.save()
 
-    def load_model(self, model_name):
-        """Загрузка указанной модели Whisper"""
-        pass
+    # --- Заглушки для будущих этапов ---
+    # Альтернативный метод с другой реализацией
+    # def get_file_data(self) -> dict[str, any]:
+    #     """Выбор файла через диалог (логика будет в file_operations)"""
+    #     # Сюда мы позже подключим ваш open_file_dialog
+    #     return {"status": "error", "message": "Метод еще не реализован"}
+
+    # region Заглушки на будущее (решил пока не удалять)
 
     def start_recording(self):
         """Начать запись с микрофона"""
@@ -123,3 +200,5 @@ class AppAPI:
     def create_subtitles(self, text, file_path):
         """Создать файл субтитров (.srt) из текста"""
         pass
+
+    # endregion

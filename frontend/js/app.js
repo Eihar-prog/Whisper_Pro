@@ -28,10 +28,7 @@ function initializeEventListeners() {
   loadSettingsUI();
 
   // Обработчик клика по основной кнопке действия
-  getElement('main-action-btn').addEventListener(
-    'click',
-    handleMainActionClick,
-  );
+  getElement('main-action-btn').addEventListener('click', startTranscription);
 
   // Обработчик включения/выключения субтитров
   getElement('subtitle-toggle').addEventListener('change', changeSubtitles);
@@ -70,14 +67,14 @@ function initializeEventListeners() {
  * Обработчик клика по основной кнопке действия
  * Запускает или останавливает анимацию прогресса
  */
-function handleMainActionClick() {
-  const container = getElement('progress-container');
+// function handleMainActionClick() {
+//   const container = getElement('progress-container');
 
-  if (container.classList.contains('hidden')) {
-    // Запускаем анимацию прогресса
-    startProgressAnimation(45); // 45 секунд - примерная длительность
-  } else {
-    // Останавливаем анимацию прогресса
-    stopProgressAnimation();
-  }
-}
+//   if (container.classList.contains('hidden')) {
+//     // Запускаем анимацию прогресса
+//     startProgressAnimation(45); // 45 секунд - примерная длительность
+//   } else {
+//     // Останавливаем анимацию прогресса
+//     stopProgressAnimation();
+//   }
+// }

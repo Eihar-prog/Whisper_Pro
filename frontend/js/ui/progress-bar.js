@@ -9,23 +9,21 @@ let progressInterval = null;
 
 /**
  * Обновление состояния прогресс-бара
- * @param {number} percent - Процент выполнения (0-100)
- * @param {string} currentTime - Текущее время в формате MM:SS
- * @param {string} totalTime - Общее время в формате MM:SS
+ * @param {number} percent - Процент выполнения
+ * @param {string} filePos - Позиция в аудиофайле (MM:SS)
+ * @param {string} fileTotal - Общая длительность файла (MM:SS)
+ * @param {string} elapsedReal - Реально затраченное время (MM:SS)
  */
-function updateProgress(percent, currentTime, totalTime) {
+function updateProgress(percent, filePos, fileTotal, elapsedReal) {
   const progressBar = getElement('progress-bar');
   const progressPercent = getElement('progress-percent');
   const timeDisplay = getElement('time-display');
 
-  // Обновляем ширину прогресс-бара
   progressBar.style.width = percent + '%';
+  setText(progressPercent, Math.round(percent) + '%');
 
-  // Обновляем отображение процента
-  setText(progressPercent, percent + '%');
-
-  // Обновляем отображение времени
-  setText(timeDisplay, `${currentTime} / ${totalTime}`);
+  // Формат: "01:20 / 05:00 (Реальное: 00:15)"
+  setText(timeDisplay, `${filePos} / ${fileTotal} (Реальное: ${elapsedReal})`);
 }
 
 /**

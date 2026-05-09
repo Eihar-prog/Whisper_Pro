@@ -42,7 +42,7 @@ def main():
     window._js_api = api
     api.set_window(window)
 
-    # window.events.closing += api.save_config
+    window.events.closing += api.save_config
 
     webview.start(debug=False)
 
