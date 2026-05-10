@@ -1,6 +1,7 @@
 # 🔇 Тяжёлые файлы и папки — не коммитим
 /ai_models/
 /ffmpeg/
+/Исходники/
 
 # 🐍 Python
 __pycache__/
@@ -17,6 +18,7 @@ venv/
 .mypy_cache/
 
 # 🖥️ IDE и редакторы
+Whisper_Pro.code-workspace
 .vscode/
 .idea/
 *.swp

@@ -3,12 +3,14 @@
 Управление загрузкой, кэшированием и выбором моделей
 """
 
-import time
-import threading
-from pathlib import Path
-from faster_whisper import WhisperModel
 import os
+import threading
+import time
+from pathlib import Path
+from typing import Any
+
 import numpy as np
+from faster_whisper import WhisperModel
 
 # Отключаем предупреждение о симлинках в Windows (решает вашу проблему в консоли)
 os.environ["HF_HUB_DISABLE_SYMLINKS_WARNING"] = "1"
@@ -93,11 +95,11 @@ class ModelManager:
 
                 dummy_audio = np.zeros(16000, dtype=np.float32)  # 1 сек тишины
                 list(self.model.transcribe(dummy_audio, beam_size=1))
-            except:
-                pass
+            except Exception as e:
+                print(f"Warmup failed: {e}")
 
     # Получение готовности модели
-    def get_status(self) -> dict[str, any]:
+    def get_status(self) -> dict[str, Any]:
         """
         Метод для 'пинг-понга' статуса с JavaScript [11].
         Возвращает текущее состояние менеджера.

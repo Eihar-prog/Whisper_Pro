@@ -1,0 +1,41 @@
+{
+	"folders": [
+		{
+			"name": "Whisper_Pro",
+			"path": "C:/Users/dmitb/Desktop/Whisper_Pro"
+		}
+	],
+	"settings": {
+		"cSpell.words": [
+			"ffprobe",
+			"flac",
+			"nokey",
+			"noprint",
+			"oneline",
+			"pywebview",
+			"pywebviewready",
+			"Автосохранение",
+			"аудиофайла",
+			"аудиоформатов",
+			"аудиоформатом",
+			"безсерверный",
+			"закоммитил",
+			"коммита",
+			"коммитах",
+			"коммиту",
+			"прогрессбар",
+			"транскрибатора",
+			"транскрибации",
+			"транскрибацию",
+			"Транскрибация",
+			"фичу",
+			"фронтенд",
+			"человекочитаемые"
+		],
+		"python.analysis.extraPaths": [
+			"./runtime/Lib/site-packages"
+		],
+		"commentTranslate.source": "TranSmart",
+		"commentTranslate.hover.enabled": true
+	}
+}

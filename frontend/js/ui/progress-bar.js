@@ -1,37 +1,59 @@
 /**
  * Модуль управления прогресс-баром
- * Обрабатывает отображение процесса обработки аудио,
- * обновление процентов и временных меток
+ * Отвечает за плавную анимацию и обновление временных меток
  */
 
-// Глобальная переменная для хранения интервала прогресса
-let progressInterval = null;
+let targetProgress = 0; // Куда должен дойти бар
+let currentProgress = 0; // Где бар находится сейчас
+let animationFrameId = null;
 
 /**
- * Обновление состояния прогресс-бара
- * @param {number} percent - Процент выполнения
- * @param {string} filePos - Позиция в аудиофайле (MM:SS)
- * @param {string} fileTotal - Общая длительность файла (MM:SS)
- * @param {string} elapsedReal - Реально затраченное время (MM:SS)
+ * Цикл анимации (60 FPS)
  */
-function updateProgress(percent, filePos, fileTotal, elapsedReal) {
+function animateProgressBar() {
+  // Плавное приближение к цели
+  currentProgress += (targetProgress - currentProgress) * 0.1;
+
   const progressBar = getElement('progress-bar');
   const progressPercent = getElement('progress-percent');
+
+  if (progressBar) {
+    progressBar.style.width = currentProgress + '%';
+  }
+  if (progressPercent) {
+    setText(progressPercent, Math.round(currentProgress) + '%');
+  }
+
+  animationFrameId = requestAnimationFrame(animateProgressBar);
+}
+
+// Запускаем цикл анимации при загрузке страницы
+animationFrameId = requestAnimationFrame(animateProgressBar);
+
+/**
+ * Обновление данных прогресса (вызывается из Python/JS)
+ */
+function updateProgress(percent, filePos, fileTotal, elapsedReal) {
+  // Устанавливаем новую цель
+  targetProgress = percent;
+
+  // Обновляем текст
   const timeDisplay = getElement('time-display');
-
-  progressBar.style.width = percent + '%';
-  setText(progressPercent, Math.round(percent) + '%');
-
-  // Формат: "01:20 / 05:00 (Реальное: 00:15)"
-  setText(timeDisplay, `${filePos} / ${fileTotal} (Реальное: ${elapsedReal})`);
+  if (timeDisplay) {
+    setText(
+      timeDisplay,
+      `${filePos} / ${fileTotal} (Реальное: ${elapsedReal})`,
+    );
+  }
 }
 
 /**
- * Показать/скрыть контейнер прогресса
- * @param {boolean} show - Показывать (true) или скрывать (false)
+ * Показать/скрыть контейнер
  */
 function showProgressContainer(show) {
   const container = getElement('progress-container');
+  if (!container) return;
+
   if (show) {
     removeClass(container, 'hidden');
     addClass(container, 'visible');
@@ -39,51 +61,4 @@ function showProgressContainer(show) {
     addClass(container, 'hidden');
     removeClass(container, 'visible');
   }
-}
-
-/**
- * Начать анимацию прогресса
- * @param {number} duration - Продолжительность в секундах
- */
-function startProgressAnimation(duration) {
-  let prog = 0;
-
-  // Очищаем предыдущий интервал, если он был
-  if (progressInterval) {
-    clearInterval(progressInterval);
-  }
-
-  showProgressContainer(true);
-
-  progressInterval = setInterval(() => {
-    prog += 1;
-    if (prog > 100) {
-      clearInterval(progressInterval);
-      return;
-    }
-
-    // Вычисляем текущее время в формате MM:SS
-    const currentSec = Math.floor((prog / 100) * duration);
-    const displayTime = `00:${String(currentSec).padStart(2, '0')} / 00:${duration}`;
-
-    updateProgress(
-      prog,
-      `00:${String(currentSec).padStart(2, '0')}`,
-      `00:${duration}`,
-    );
-  }, 50);
-}
-
-/**
- * Остановить анимацию прогресса
- */
-function stopProgressAnimation() {
-  if (progressInterval) {
-    clearInterval(progressInterval);
-    progressInterval = null;
-  }
-
-  // Сбрасываем значения прогресса
-  updateProgress(0, '00:00', '00:00');
-  showProgressContainer(false);
 }

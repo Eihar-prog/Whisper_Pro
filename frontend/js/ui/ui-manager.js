@@ -204,3 +204,30 @@ async function saveBtnClick() {
   const isSubtileFile = subtitleToggle.checked;
   await pywebview.api.save_text(text, isSubtileFile);
 }
+
+/**
+ * Блокирует или разблокирует элементы управления во время транскрибации
+ * @param {boolean} locked - true если идет процесс, false если готов
+ */
+function setInterfaceLocked(locked) {
+  const inputs = [
+    modelSelect,
+    langSelect,
+    translateToggle,
+    subtitleToggle,
+    hotkeyInput,
+    ...document.querySelectorAll('input[name="mode"]'),
+  ];
+
+  // Кнопка выбора файла
+  const fileBtn = getElement('select-file-btn');
+
+  inputs.forEach((el) => (el.disabled = locked));
+  fileBtn.disabled = locked;
+
+  // Управление кнопкой отмены
+  const cancelBtn = getElement('cancel-action-btn');
+  if (cancelBtn) {
+    toggleClass(cancelBtn, 'hidden', !locked);
+  }
+}

@@ -4,8 +4,9 @@
 """
 
 import sys
-import webview
 from pathlib import Path
+
+import webview
 
 from py_src.api.app_api import AppAPI
 
