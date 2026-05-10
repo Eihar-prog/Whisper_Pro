@@ -49,7 +49,7 @@ function updateModeUI() {
   const subtitleContainer = getElement('subtitle-container');
 
   // Не обновляем, если кнопка заблокирована (идет загрузка модели)
-  if (mainBtn.disabled) return;
+  if (mainBtn.getAttribute('data-is-loading') === 'true') return;
 
   if (isFileMode) {
     // Режим файла
@@ -62,6 +62,7 @@ function updateModeUI() {
       mainBtn,
       isTranslate ? 'Транскрибация с переводом' : 'Начать транскрибацию',
     );
+
     toggleClass(mainBtn, 'is-file-mode', !isTranslate);
 
     // Активируем соответствующий режим
@@ -84,6 +85,7 @@ function updateModeUI() {
 
   // Обновляем классы кнопки в зависимости от режима перевода
   toggleClass(mainBtn, 'is-translate-mode', isTranslate);
+  console.log(mainBtn.textContent);
 }
 
 const modelSelect = getElement('model-select');
@@ -116,6 +118,12 @@ async function loadSettingsUI() {
   ).checked = true;
   subtitleToggle.checked = generate_subtitles || false;
 
+  // updateModeUI();
+
+  // ДОБАВЛЯЕМ ЭТО: если модель выбрана в конфиге, загружаем её
+  if (model_size) {
+    loadWhisperModel();
+  }
   updateModeUI();
 }
 
@@ -188,7 +196,7 @@ async function changeSubtitles(event) {
  * Копируем текст из textarea в буфер обмена
  */
 async function copyBtnClick() {
-  const text = document.getElementById('output-text').value;
+  const text = getElement('output-text').value.trim();
   try {
     await navigator.clipboard.writeText(text);
   } catch (err) {
@@ -200,7 +208,7 @@ async function copyBtnClick() {
  * Сохраняем текст в файл
  */
 async function saveBtnClick() {
-  const text = document.getElementById('output-text').value;
+  const text = getElement('output-text').value.trim();
   const isSubtileFile = subtitleToggle.checked;
   await pywebview.api.save_text(text, isSubtileFile);
 }
@@ -216,6 +224,8 @@ function setInterfaceLocked(locked) {
     translateToggle,
     subtitleToggle,
     hotkeyInput,
+    getElement('copy-btn'),
+    getElement('save-btn'),
     ...document.querySelectorAll('input[name="mode"]'),
   ];
 
@@ -230,4 +240,12 @@ function setInterfaceLocked(locked) {
   if (cancelBtn) {
     toggleClass(cancelBtn, 'hidden', !locked);
   }
+}
+
+/**
+ * Прерываем процесс транскрибации аудио файла
+ */
+async function cancelBtnClick() {
+  pywebview.api.cancel_transcription();
+  setInterfaceLocked(false);
 }

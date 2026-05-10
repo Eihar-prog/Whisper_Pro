@@ -3,17 +3,18 @@ API точки для взаимодействия с веб-интерфейс�
 Обрабатывает вызовы из JavaScript через pywebview
 """
 
-import os
-from pathlib import Path
-import webview
-import subprocess
 import json
+import os
+import subprocess
 import threading
+from pathlib import Path
+
+import webview
 
 import py_src.utils.file_operations as file_op
-from py_src.utils.config import ConfigManager
 from py_src.core.model_manager import ModelManager
 from py_src.core.transcriber import WhisperTranscriber
+from py_src.utils.config import ConfigManager
 
 
 class AppAPI:
@@ -23,6 +24,7 @@ class AppAPI:
         self.config_manager = ConfigManager()
         self.model_manager = ModelManager()
         self.transcriber = WhisperTranscriber(self.model_manager)
+        self._is_canceled = False  # отмена пользователем
 
     def set_window(self, window: webview.Window) -> None:
         """Установка ссылки на окно pywebview для диалогов и событий"""
@@ -34,29 +36,51 @@ class AppAPI:
         """
         Запуск процесса расшифровки в отдельном потоке.
         """
+        # Сбрасываем флаг перед новым запуском
+        self._is_cancelled = False
+
         if not self.model_manager.model:
             return {"status": "error", "message": "Модель не загружена"}
 
         config = self.config_manager.get_all()
         language = config.get("source_language", "auto")
+        translate = config.get(
+            "translate_to_english", False
+        )  # Читаем состояние чекбокса
 
         # Запускаем в потоке-демоне, чтобы не блокировать UI и корректно завершать приложение
         thread = threading.Thread(
-            target=self._run_transcription_loop, args=(file_path, language), daemon=True
+            target=self._run_transcription_loop,
+            args=(file_path, language, translate),
+            daemon=True,
         )
         thread.start()
 
         return {"status": "started"}
 
-    def _run_transcription_loop(self, file_path: str, language: str):
+    def cancel_transcription(self):
+        """Метод вызывается из JS при нажатии кнопки Отмена"""
+        self._is_cancelled = True
+        return {"status": "cancelled"}
+
+    def _run_transcription_loop(
+        self, file_path: str, language: str, translate: bool = False
+    ):
         """Внутренний цикл перебора сегментов и отправки их в JS"""
         try:
             # Получаем генератор из транскрибатора
             segments_generator = self.transcriber.transcribe(
-                file_path=file_path, language=language
+                file_path=file_path, language=language, translate=translate
             )
 
             for segment in segments_generator:
+                if self._is_cancelled:
+                    print("--- Транскрибация прервана пользователем ---")
+                    # Можно отправить в JS событие, что отмена принята
+                    if self._window:
+                        self._window.evaluate_js("handleTranscriptionEnd()")
+                    return
+
                 # Кодируем сегмент в JSON для безопасной передачи в JS
                 segment_json = json.dumps(segment, ensure_ascii=False)
 
@@ -138,7 +162,12 @@ class AppAPI:
         if not file_path:
             return
 
-        file_op.save_text_file(text, file_path)
+        # Если это субтитры, можно добавить нумерацию блоков (1, 2, 3...)
+        final_content = text
+        if is_subtitle_file:
+            final_content = file_op.add_srt_numeration(text)
+
+        file_op.save_text_file(final_content, file_path)
         directory = str(Path(file_path).parent)
         if output_dir != directory:  # Если папка не совпадает с предыдущей
             self.config_manager.set("text_output_dir", directory)

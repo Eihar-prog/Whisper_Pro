@@ -17,6 +17,8 @@
 document.addEventListener('DOMContentLoaded', function () {
   window.addEventListener('pywebviewready', () => {
     initializeEventListeners();
+    // Загрузка настроек из файла настроек
+    loadSettingsUI();
   });
 });
 
@@ -24,9 +26,6 @@ document.addEventListener('DOMContentLoaded', function () {
  * Инициализация обработчиков событий
  */
 function initializeEventListeners() {
-  // Загрузка настроек из файла настроек
-  loadSettingsUI();
-
   // Обработчик клика по основной кнопке действия
   getElement('main-action-btn').addEventListener('click', startTranscription);
 
@@ -61,20 +60,7 @@ function initializeEventListeners() {
 
   // Обработчик кнопки "Сохранить"
   getElement('save-btn').addEventListener('click', saveBtnClick);
+
+  // Обработчик кнопки "Отмена" для транскрибации
+  getElement('cancel-action-btn').addEventListener('click', cancelBtnClick);
 }
-
-/**
- * Обработчик клика по основной кнопке действия
- * Запускает или останавливает анимацию прогресса
- */
-// function handleMainActionClick() {
-//   const container = getElement('progress-container');
-
-//   if (container.classList.contains('hidden')) {
-//     // Запускаем анимацию прогресса
-//     startProgressAnimation(45); // 45 секунд - примерная длительность
-//   } else {
-//     // Останавливаем анимацию прогресса
-//     stopProgressAnimation();
-//   }
-// }

@@ -5,6 +5,7 @@
 
 import time
 from typing import Generator
+
 from py_src.core.model_manager import ModelManager
 
 
@@ -17,7 +18,11 @@ class WhisperTranscriber:
         self.model_manager = model_manager
 
     def transcribe(
-        self, file_path: str, language: str = None, beam_size: int = 5
+        self,
+        file_path: str,
+        language: str = None,
+        beam_size: int = 5,
+        translate: bool = False,
     ) -> Generator[dict[str, any], None, None]:
         """
         Основной метод транскрибации файла.
@@ -30,6 +35,9 @@ class WhisperTranscriber:
             yield {"error": "Модель не загружена"}
             return
 
+        # Определяем задачу: transcribe (обычно) или translate
+        task = "translate" if translate else "transcribe"
+
         # Запускаем транскрибацию через faster-whisper
         # transcribe возвращает кортеж (генератор сегментов, информация об аудио)
         segments, info = model.transcribe(
@@ -38,6 +46,7 @@ class WhisperTranscriber:
             language=(
                 language if language != "auto" else None
             ),  # Whisper сам поймет язык, если передать None
+            task=task,
             word_timestamps=False,  # Для базовой версии сегментов достаточно
         )
 

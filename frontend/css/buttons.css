@@ -88,3 +88,23 @@
 .file-select-button:hover {
   background-color: #3b82f6; /* hover:bg-blue-500 */
 }
+
+/* Кнопка отмены расшифровки аудио */
+.cancel-button {
+  background-color: #475569; /* slate-600 */
+  color: #f1f5f9;
+  font-weight: bold;
+  padding: 16px 20px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cancel-button:hover {
+  background-color: #ef4444; /* red-500 при наведении */
+}
+
+.cancel-button:active {
+  transform: scale(0.98);
+}

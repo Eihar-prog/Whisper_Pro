@@ -35,11 +35,11 @@
             <label class="form-field-label">Модель Whisper</label>
             <select id="model-select" class="form-select">
               <option value="" disabled selected>Выберите модель...</option>
-              <option value="tiny">Tiny (Самая быстрая)</option>
-              <option value="base">Base (Оптимально)</option>
-              <option value="small">Small (Точно)</option>
-              <option value="medium">Medium</option>
-              <option value="large">Large (высокая точность)</option>
+              <option value="tiny">Tiny (Мгновенно | ~75 МБ)</option>
+              <option value="base">Base (Быстро x7 | ~140 МБ)</option>
+              <option value="small">Small (Точно x2 | ~460 МБ)</option>
+              <option value="medium">Medium (Качественно x1 | ~1.5 ГБ)</option>
+              <option value="large">Large (Максимум | ~3 ГБ)</option>
             </select>
           </div>
 
@@ -190,9 +190,14 @@
             </div>
           </div>
 
-          <button id="main-action-btn" class="action-button">
-            Начать запись
-          </button>
+          <div style="display: flex; gap: 10px">
+            <button id="cancel-action-btn" class="cancel-button hidden">
+              ✕ Отмена
+            </button>
+            <button id="main-action-btn" class="action-button">
+              Начать транскрибацию
+            </button>
+          </div>
         </div>
       </main>
     </div>

@@ -22,6 +22,7 @@ async function startTranscription() {
   // 2. Подготовка UI
   setText(mainBtn, 'Обработка...');
   mainBtn.disabled = true;
+  setInterfaceLocked(true);
   setStatusProcessing(); // Синий индикатор из status-indicator.js
 
   // Очищаем поле вывода перед новой работой (опционально)
@@ -55,12 +56,21 @@ async function startTranscription() {
  */
 window.handleNewSegment = function (segment) {
   const outputArea = getElement('output-text');
+  const isSubtitleMode = getElement('subtitle-toggle').checked;
 
-  // Добавляем текст сегмента в textarea
-  // Мы не используем .strip(), чтобы сохранить естественные пробелы от Whisper
-  outputArea.value += segment.text;
+  let textToAdd = '';
+
+  if (isSubtitleMode) {
+    // Форматируем время в SRT-стиль: 00:00:01,234
+    const start = formatSRTTime(segment.start);
+    const end = formatSRTTime(segment.end);
+    textToAdd = `${start} --> ${end}\n${segment.text.trim()}\n\n`;
+  } else {
+    textToAdd = segment.text;
+  }
 
   // Автоматическая прокрутка вниз, чтобы видеть свежий текст
+  outputArea.value += textToAdd;
   outputArea.scrollTop = outputArea.scrollHeight;
 
   // Считаем прошедшее РЕАЛЬНОЕ время
@@ -100,6 +110,7 @@ window.handleTranscriptionEnd = function () {
   setStatusReady(currentModel);
 
   console.log('Транскрибация успешно завершена');
+  setInterfaceLocked(false);
 };
 
 /**
@@ -109,4 +120,14 @@ function formatTime(seconds) {
   const s = Math.floor(seconds);
   const m = Math.floor(s / 60);
   return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
+}
+
+/**
+ * Форматирование секунд для файл субтитров
+ */
+function formatSRTTime(seconds) {
+  const date = new Date(0);
+  date.setMilliseconds(seconds * 1000);
+  // Формат: HH:MM:SS,mmm
+  return date.toISOString().substr(11, 12).replace('.', ',');
 }

@@ -4,8 +4,9 @@
 """
 
 import json
-from pathlib import Path
 import subprocess
+from pathlib import Path
+
 import webview
 
 # Путь к ffprobe
@@ -13,6 +14,9 @@ ffprobe_path = Path(__file__).parents[2] / "ffmpeg" / "bin" / "ffprobe.exe"
 
 #  Путь к json файлу поддерживаемых форматов
 supported_formats_path = Path(__file__).parents[2] / "supported_formats.json"
+
+# Сохраняем путь к открытому файлу (нужно для файла субтитров)
+open_file_path = None
 
 
 # Сохранение текста в файл
@@ -46,10 +50,15 @@ def save_file_dialog(
     window: webview.Window, output_dir="/", is_subtitle_file=False
 ) -> str | None:
     """Открыть диалог сохранения файла"""
+
+    file_name_only = Path(open_file_path).stem if open_file_path else "output"
+
     result = window.create_file_dialog(
         webview.FileDialog.SAVE,
         directory=output_dir,
-        save_filename="output.srt" if is_subtitle_file else "output.txt",
+        save_filename=(
+            f"{file_name_only}.srt" if is_subtitle_file else f"{file_name_only}.txt"
+        ),
         file_types=(
             ("SubRip Subtitle (*.srt)",) if is_subtitle_file else ("Text file (*.txt)",)
         ),
@@ -103,7 +112,11 @@ def open_file_dialog(
         allow_multiple=False,
         file_types=file_types,
     )
-    return file_path_tuple[0] if file_path_tuple else None
+    if file_path_tuple:
+        global open_file_path
+        open_file_path = file_path_tuple[0]
+        return open_file_path
+    return None
 
 
 #  Получение метаданных аудио или видео файла
@@ -164,3 +177,13 @@ def format_size(size_bytes: int) -> str:
     # Если вдруг файл больше гигабайта
     size_gb = size_mb / 1024
     return f"{size_gb:.2f} ГБ"
+
+
+def add_srt_numeration(text: str) -> str:
+    """Превращает сырые таймкоды в нумерованные блоки SRT"""
+    blocks = text.split("\n\n")
+    # Добавим strip для самих блоков, чтобы пустые строки не дублировались
+    numbered_blocks = [
+        f"{i+1}\n{block.strip()}" for i, block in enumerate(blocks) if block.strip()
+    ]
+    return "\n\n".join(numbered_blocks)
