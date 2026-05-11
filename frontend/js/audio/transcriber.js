@@ -5,16 +5,23 @@
 
 let transcriptionStartTime = 0; // Для отслеживания реального времени
 
+import { openFileData } from '../state.js';
+import { showProgressContainer, updateProgress } from '../ui/progress-bar.js';
+import { setStatusProcessing, setStatusReady } from '../ui/status-indicator.js';
+import { setInterfaceLocked } from '../ui/ui-manager.js';
+import { getElement, setText } from '../utils/dom-utils.js';
+import { formatSRTTime, formatTime } from '../utils/helper.js';
+
 /**
  * Запуск транскрибации файла
  */
-async function startTranscription() {
+export async function startTranscription() {
   const outputArea = getElement('output-text');
   const mainBtn = getElement('main-action-btn');
 
   // 1. Получаем путь к файлу, который мы выбрали ранее
   // file_path хранится в file-handler.js
-  if (!file_path) {
+  if (!openFileData.filePath) {
     alert('Пожалуйста, выберите файл!');
     return;
   }
@@ -31,7 +38,7 @@ async function startTranscription() {
   // Показываем контейнер прогрессбара
   showProgressContainer(true);
   // Сбрасываем прогрессбар на 0, показывая общую длину
-  updateProgress(0, '00:00', formatTime(window.currentFileDuration), '00:00');
+  updateProgress(0, '00:00', formatTime(openFileData.duration), '00:00');
 
   // Фиксируем время начала (реальное время на часах)
   transcriptionStartTime = Date.now();
@@ -39,7 +46,9 @@ async function startTranscription() {
   try {
     // 3. Вызываем метод в Python API
     // Напомню: в Python это запустит фоновый поток и сразу вернет {status: "started"}
-    const response = await pywebview.api.start_transcription(file_path);
+    const response = await pywebview.api.start_transcription(
+      openFileData.filePath,
+    );
 
     if (response.status === 'error') {
       throw new Error(response.message);
@@ -75,7 +84,7 @@ window.handleNewSegment = function (segment) {
 
   // Считаем прошедшее РЕАЛЬНОЕ время
   // Берем общую длительность из нашей "памяти"
-  const totalDuration = window.currentFileDuration || 0;
+  const totalDuration = openFileData.duration || 0;
 
   const filePos = formatTime(segment.end);
   const fileTotal = formatTime(totalDuration);
@@ -96,8 +105,8 @@ window.handleTranscriptionEnd = function () {
   const finalRealTime = formatTime(
     (Date.now() - transcriptionStartTime) / 1000,
   );
-  const totalFileTime = formatTime(window.currentFileDuration || 0);
-  console.log(window.currentFileDuration);
+  const totalFileTime = formatTime(openFileData.duration || 0);
+  console.log(openFileData.duration);
 
   updateProgress(100, totalFileTime, totalFileTime, finalRealTime);
 
@@ -112,22 +121,3 @@ window.handleTranscriptionEnd = function () {
   console.log('Транскрибация успешно завершена');
   setInterfaceLocked(false);
 };
-
-/**
- * Вспомогательная функция для форматирования секунд в MM:SS
- */
-function formatTime(seconds) {
-  const s = Math.floor(seconds);
-  const m = Math.floor(s / 60);
-  return `${String(m).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
-}
-
-/**
- * Форматирование секунд для файл субтитров
- */
-function formatSRTTime(seconds) {
-  const date = new Date(0);
-  date.setMilliseconds(seconds * 1000);
-  // Формат: HH:MM:SS,mmm
-  return date.toISOString().substr(11, 12).replace('.', ',');
-}

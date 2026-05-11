@@ -1,17 +1,23 @@
 /**
- * @typedef {import('./utils/dom-utils.js').getElement} getElement
- * @typedef {import('./ui/ui-manager.js').updateModeUI}
- * @typedef {import('./ui/ui-manager.js').toggleTranslateMode}
- * @typedef {import('./models/model-manager.js').simulateModelLoading}
- * @typedef {import('./ui/progress-bar.js').startProgressAnimation}
- * @typedef {import('./ui/progress-bar.js').stopProgressAnimation}
- */
-
-/**
  * Главный файл приложения Whisper Pro
  * Управляет инициализацией всего приложения, обработкой событий DOMContentLoaded
  * и координацией между различными модулями
  */
+
+import { selectFileClick } from './audio/file-handler.js';
+import { startTranscription } from './audio/transcriber.js';
+import { loadSettingsUI } from './config/settings.js';
+import { copyBtnClick, saveBtnClick } from './output/result-handler.js';
+import {
+  cancelBtnClick,
+  changeMode,
+  changeSubtitles,
+  hotkeyChange,
+  selectLangChange,
+  selectModelChange,
+  toggleTranslateChange,
+} from './ui/ui-manager.js';
+import { getElement } from './utils/dom-utils.js';
 
 // Документ готов к взаимодействию
 document.addEventListener('DOMContentLoaded', function () {

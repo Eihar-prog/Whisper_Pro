@@ -4,6 +4,13 @@
  * и визуальное отображение этих состояний
  */
 
+import {
+  addClass,
+  getElement,
+  removeClass,
+  setText,
+} from '../utils/dom-utils.js';
+
 /**
  * Обновление статуса приложения
  * @param {string} statusType - Тип статуса ('ready', 'loading-model', 'processing')
@@ -37,14 +44,14 @@ function updateStatus(statusType, message, subMessage, color) {
  * Установка статуса готовности
  * @param {string} modelName - Название текущей модели
  */
-function setStatusReady(modelName) {
+export function setStatusReady(modelName) {
   updateStatus('ready', 'Готов к работе', `Модель: ${modelName}`, '#22c55e');
 }
 
 /**
  * Установка статуса загрузки модели
  */
-function setStatusLoadingModel() {
+export function setStatusLoadingModel() {
   updateStatus(
     'loading',
     'Загрузка модели...',
@@ -56,7 +63,7 @@ function setStatusLoadingModel() {
 /**
  * Установка статуса обработки
  */
-function setStatusProcessing() {
+export function setStatusProcessing() {
   updateStatus(
     'processing',
     'Обработка...',

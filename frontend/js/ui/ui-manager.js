@@ -4,6 +4,16 @@
  * и другие изменения в интерфейсе
  */
 
+import { updateConfig } from '../config/settings.js';
+import { loadWhisperModel } from '../models/model-manager.js';
+import {
+  addClass,
+  getElement,
+  removeClass,
+  setText,
+  toggleClass,
+} from '../utils/dom-utils.js';
+
 /**
  * Переключение режима перевода
  * Обновляет интерфейс в зависимости от включенного/выключенного режима перевода
@@ -38,7 +48,7 @@ function toggleTranslateMode() {
  * Обновление интерфейса в зависимости от выбранного режима работы
  * (микрофон или файл)
  */
-function updateModeUI() {
+export function updateModeUI() {
   const isFileMode =
     document.querySelector('input[name="mode"]:checked').value === 'file';
   const isTranslate = getElement('translate-toggle').checked;
@@ -74,6 +84,10 @@ function updateModeUI() {
     removeClass(fileContext, 'visible');
     addClass(subtitleContainer, 'hidden');
 
+    // Отключаем субтитры в режиме микрофона
+    const subtitleCheckbox = getElement('subtitle-toggle');
+    subtitleCheckbox.checked = false;
+
     // Обновляем текст кнопки в зависимости от режима перевода
     setText(mainBtn, isTranslate ? 'Запись с переводом' : 'Начать запись (🎤)');
     removeClass(mainBtn, 'is-file-mode');
@@ -95,44 +109,10 @@ const hotkeyInput = getElement('hotkey-input');
 const subtitleToggle = getElement('subtitle-toggle');
 
 /**
- * Загрузка настроек интерфейса при запуске приложения
- */
-async function loadSettingsUI() {
-  const config = await pywebview.api.load_config();
-
-  const {
-    model_size,
-    source_language,
-    translate_to_english,
-    hotkey_record,
-    operation_mode,
-    generate_subtitles,
-  } = config;
-
-  modelSelect.value = model_size || '';
-  langSelect.value = source_language || 'auto';
-  translateToggle.checked = translate_to_english || false;
-  hotkeyInput.value = hotkey_record || 'Ctrl+Shift+R';
-  document.querySelector(
-    `input[name="mode"][value="${operation_mode}"]`,
-  ).checked = true;
-  subtitleToggle.checked = generate_subtitles || false;
-
-  // updateModeUI();
-
-  // ДОБАВЛЯЕМ ЭТО: если модель выбрана в конфиге, загружаем её
-  if (model_size) {
-    loadWhisperModel();
-  }
-  updateModeUI();
-}
-
-/**
  * Действие при выборе модели whisper
  */
-async function selectModelChange() {
-  await pywebview.api.set_setting('model_size', modelSelect.value);
-  await pywebview.api.save_config();
+export async function selectModelChange() {
+  await updateConfig('model_size', modelSelect.value);
   // загрузка модели whisper и опрос состояния
   loadWhisperModel();
 }
@@ -140,22 +120,15 @@ async function selectModelChange() {
 /**
  * Действие при выборе языка расшифровки аудио
  */
-async function selectLangChange() {
-  await pywebview.api.set_setting('source_language', langSelect.value);
-  await pywebview.api.save_config();
-
-  // TODO Изменить настройки языка в модели whisper в python
+export async function selectLangChange() {
+  await updateConfig('source_language', langSelect.value);
 }
 
 /**
  * Включаем или отключаем перевод аудио на английский
  */
-async function toggleTranslateChange() {
-  await pywebview.api.set_setting(
-    'translate_to_english',
-    translateToggle.checked,
-  );
-  await pywebview.api.save_config();
+export async function toggleTranslateChange() {
+  await updateConfig('translate_to_english', translateToggle.checked);
 
   // Обновляем интерфейс в зависимости от выбранного режима
   toggleTranslateMode();
@@ -164,19 +137,17 @@ async function toggleTranslateChange() {
 /**
  * Смена горячих клавиш
  */
-async function hotkeyChange() {
-  await pywebview.api.set_setting('hotkey_record', hotkeyInput.value);
-  await pywebview.api.save_config();
+export async function hotkeyChange() {
+  await updateConfig('hotkey_record', hotkeyInput.value);
 }
 
 /**
  * Смена режима работы (аудио файл или микрофон)
  */
-async function changeMode(event) {
+export async function changeMode(event) {
   const radio = event.target;
   if (radio.checked) {
-    await pywebview.api.set_setting('operation_mode', radio.value);
-    await pywebview.api.save_config();
+    await updateConfig('operation_mode', radio.value);
 
     // Обновляем интерфейс
     updateModeUI();
@@ -186,38 +157,16 @@ async function changeMode(event) {
 /**
  * Включаем/выключаем субтитры
  */
-async function changeSubtitles(event) {
+export async function changeSubtitles(event) {
   const isEnabled = event.target.checked;
-  await pywebview.api.set_setting('generate_subtitles', isEnabled);
-  await pywebview.api.save_config();
-}
-
-/**
- * Копируем текст из textarea в буфер обмена
- */
-async function copyBtnClick() {
-  const text = getElement('output-text').value.trim();
-  try {
-    await navigator.clipboard.writeText(text);
-  } catch (err) {
-    console.error('Ошибка копирования:', err);
-  }
-}
-
-/**
- * Сохраняем текст в файл
- */
-async function saveBtnClick() {
-  const text = getElement('output-text').value.trim();
-  const isSubtileFile = subtitleToggle.checked;
-  await pywebview.api.save_text(text, isSubtileFile);
+  await updateConfig('generate_subtitles', isEnabled);
 }
 
 /**
  * Блокирует или разблокирует элементы управления во время транскрибации
  * @param {boolean} locked - true если идет процесс, false если готов
  */
-function setInterfaceLocked(locked) {
+export function setInterfaceLocked(locked) {
   const inputs = [
     modelSelect,
     langSelect,
@@ -245,7 +194,7 @@ function setInterfaceLocked(locked) {
 /**
  * Прерываем процесс транскрибации аудио файла
  */
-async function cancelBtnClick() {
+export async function cancelBtnClick() {
   pywebview.api.cancel_transcription();
   setInterfaceLocked(false);
 }

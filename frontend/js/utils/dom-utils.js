@@ -9,7 +9,7 @@
  * @param {string} id - ID элемента
  * @returns {HTMLElement} - Найденный элемент
  */
-function getElement(id) {
+export function getElement(id) {
   return document.getElementById(id);
 }
 
@@ -18,7 +18,7 @@ function getElement(id) {
  * @param {HTMLElement} element - Целевой элемент
  * @param {string} text - Текст для установки
  */
-function setText(element, text) {
+export function setText(element, text) {
   element.textContent = text;
 }
 
@@ -27,7 +27,7 @@ function setText(element, text) {
  * @param {HTMLElement} element - Целевой элемент
  * @param {string} html - HTML для установки
  */
-function setHtml(element, html) {
+export function setHtml(element, html) {
   element.innerHTML = html;
 }
 
@@ -36,7 +36,7 @@ function setHtml(element, html) {
  * @param {HTMLElement} element - Целевой элемент
  * @param {string} className - Имя класса для добавления
  */
-function addClass(element, className) {
+export function addClass(element, className) {
   element.classList.add(className);
 }
 
@@ -45,7 +45,7 @@ function addClass(element, className) {
  * @param {HTMLElement} element - Целевой элемент
  * @param {string} className - Имя класса для удаления
  */
-function removeClass(element, className) {
+export function removeClass(element, className) {
   element.classList.remove(className);
 }
 
@@ -55,6 +55,6 @@ function removeClass(element, className) {
  * @param {string} className - Имя класса для переключения
  * @param {boolean} condition - Условие для переключения
  */
-function toggleClass(element, className, condition) {
+export function toggleClass(element, className, condition) {
   element.classList.toggle(className, condition);
 }

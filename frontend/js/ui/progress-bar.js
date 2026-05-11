@@ -3,6 +3,13 @@
  * Отвечает за плавную анимацию и обновление временных меток
  */
 
+import {
+  addClass,
+  getElement,
+  removeClass,
+  setText,
+} from '../utils/dom-utils.js';
+
 let targetProgress = 0; // Куда должен дойти бар
 let currentProgress = 0; // Где бар находится сейчас
 let animationFrameId = null;
@@ -32,8 +39,13 @@ animationFrameId = requestAnimationFrame(animateProgressBar);
 
 /**
  * Обновление данных прогресса (вызывается из Python/JS)
+ * или можно задать вручную
+ * @param {number} percent  - процент прогресса (0-100)
+ * @param {string} filePos - время (текущая позиция)
+ * @param {string} fileTotal - время (продолжительность файла)
+ * @param {string} elapsedReal - время (сколько затрачено на обработку)
  */
-function updateProgress(percent, filePos, fileTotal, elapsedReal) {
+export function updateProgress(percent, filePos, fileTotal, elapsedReal) {
   // Устанавливаем новую цель
   targetProgress = percent;
 
@@ -48,9 +60,10 @@ function updateProgress(percent, filePos, fileTotal, elapsedReal) {
 }
 
 /**
- * Показать/скрыть контейнер
+ * Показать/скрыть контейнер с прогрессбаром
+ * @param {boolean} show - true - показать, false - скрыть
  */
-function showProgressContainer(show) {
+export function showProgressContainer(show) {
   const container = getElement('progress-container');
   if (!container) return;
 
