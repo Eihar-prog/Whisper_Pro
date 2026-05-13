@@ -1,8 +1,8 @@
 {
-    "model_size": "tiny",
+    "model_size": "base",
     "source_language": "auto",
     "translate_to_english": false,
-    "hotkey_record": "right ctrl",
+    "hotkey_record": "ctrl+1",
     "operation_mode": "file",
     "audio_input_dir": "C:\\Users\\dmitb\\Desktop\\WM\\test whisper",
     "text_output_dir": "D:\\Study\\JavaScript\\Bogdan Stachchuk\\Просмотрено\\Введение",

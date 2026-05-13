@@ -105,7 +105,8 @@ export function updateModeUI() {
 const modelSelect = getElement('model-select');
 const langSelect = getElement('lang-select');
 const translateToggle = getElement('translate-toggle');
-const hotkeyInput = getElement('hotkey-input');
+const hotkeyDisplay = getElement('hotkey-display');
+const changeHotkeyBtn = getElement('change-hotkey-btn');
 const subtitleToggle = getElement('subtitle-toggle');
 
 /**
@@ -137,9 +138,9 @@ export async function toggleTranslateChange() {
 /**
  * Смена горячих клавиш
  */
-export async function hotkeyChange() {
-  await updateConfig('hotkey_record', hotkeyInput.value);
-}
+// export async function hotkeyChange() {
+//   await updateConfig('hotkey_record', hotkeyInput.value);
+// }
 
 /**
  * Смена режима работы (аудио файл или микрофон)
@@ -172,7 +173,8 @@ export function setInterfaceLocked(locked) {
     langSelect,
     translateToggle,
     subtitleToggle,
-    hotkeyInput,
+    hotkeyDisplay,
+    changeHotkeyBtn,
     getElement('copy-btn'),
     getElement('save-btn'),
     ...document.querySelectorAll('input[name="mode"]'),
@@ -181,8 +183,13 @@ export function setInterfaceLocked(locked) {
   // Кнопка выбора файла
   const fileBtn = getElement('select-file-btn');
 
-  inputs.forEach((el) => (el.disabled = locked));
-  fileBtn.disabled = locked;
+  inputs.forEach((el) => {
+    if (el) el.disabled = locked;
+  });
+
+  if (fileBtn) {
+    fileBtn.disabled = locked;
+  }
 
   // Управление кнопкой отмены
   const cancelBtn = getElement('cancel-action-btn');
@@ -195,6 +202,20 @@ export function setInterfaceLocked(locked) {
  * Прерываем процесс транскрибации аудио файла
  */
 export async function cancelBtnClick() {
-  pywebview.api.cancel_transcription();
-  setInterfaceLocked(false);
+  const mainBtn = getElement('main-action-btn');
+  const cancelBtn = getElement('cancel-action-btn');
+
+  mainBtn.dataset.transcriptionCancelled = 'true';
+  mainBtn.disabled = true;
+  setText(mainBtn, 'Отмена...');
+
+  if (cancelBtn) {
+    toggleClass(cancelBtn, 'hidden', true);
+  }
+
+  try {
+    await pywebview.api.cancel_transcription();
+  } catch (error) {
+    console.error('Ошибка при отмене транскрибации:', error);
+  }
 }

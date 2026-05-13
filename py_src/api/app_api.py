@@ -14,6 +14,7 @@ import webview
 import py_src.utils.file_operations as file_op
 from py_src.core.model_manager import ModelManager
 from py_src.core.transcriber import WhisperTranscriber
+from py_src.services.hotkey_service import HotKeyService
 from py_src.utils.config import ConfigManager
 
 
@@ -25,10 +26,122 @@ class AppAPI:
         self.model_manager = ModelManager()
         self.transcriber = WhisperTranscriber(self.model_manager)
         self._is_canceled = False  # отмена пользователем
+        self.hotkey_service = None
+        self._setup_hotkey_service()  # Настройка сервиса горячих клавиш
 
     def set_window(self, window: webview.Window) -> None:
         """Установка ссылки на окно pywebview для диалогов и событий"""
         self._window = window
+
+    # --- Сервис горячих клавиш ---
+    def _setup_hotkey_service(self):
+        """Настройка сервиса горячих клавиш"""
+
+        # Создаем функцию-колбек, которая будет вызываться при нажатии горячей клавиши
+        def hotkey_callback(action: str):
+            if action == "hotkey_pressed":
+                # Вызываем JavaScript-функцию через pywebview
+                if self._window:
+                    # Эта строка выполнит JavaScript в браузере WebView
+                    self._window.evaluate_js("handleHotkeyPress()")
+
+        # Создаем сервис с переданной функцией-колбеком
+        self.hotkey_service = HotKeyService(hotkey_callback)
+        saved_hotkey = self.config_manager.get("hotkey_record")
+        if saved_hotkey:
+            if self.hotkey_service.register_hotkey(saved_hotkey):
+                normalized_hotkey = self.hotkey_service.get_current_hotkey()
+                if normalized_hotkey and normalized_hotkey != saved_hotkey:
+                    self.config_manager.set("hotkey_record", normalized_hotkey)
+                    self.config_manager.save()
+
+    # Методы для регистрации/отмены регистрации горячей клавиши
+    def register_hotkey(self, hotkey_combination: str) -> dict[str, bool | str | None]:
+        """
+        Регистрация горячей клавиши
+        :param hotkey_combination: Строка комбинации (например, "ctrl+shift+r")
+        :return: Результат операции
+        """
+        if self.hotkey_service:
+            success = self.hotkey_service.register_hotkey(hotkey_combination)
+            return {"success": success, "error": self.hotkey_service.last_error}
+        return {"success": False, "error": "Hotkey service not initialized"}
+
+    def unregister_hotkey(self) -> dict[str, bool | str | None]:
+        """
+        Отмена регистрации горячей клавиши
+        :return: Результат операции
+        """
+        if self.hotkey_service:
+            success = self.hotkey_service.unregister_hotkey()
+            return {"success": success, "error": self.hotkey_service.last_error}
+        return {"success": False, "error": "Hotkey service not initialized"}
+
+    def get_hotkey_info(self) -> dict[str, str | bool]:
+        """Получить текущую горячую клавишу и текст для отображения."""
+        if not self.hotkey_service:
+            return {
+                "success": False,
+                "hotkey": "",
+                "display": "Не назначена",
+                "error": "Hotkey service not initialized",
+            }
+
+        hotkey = self.hotkey_service.get_current_hotkey() or self.config_manager.get(
+            "hotkey_record", ""
+        )
+        return {
+            "success": True,
+            "hotkey": hotkey,
+            "display": self.hotkey_service.format_hotkey_for_display(hotkey),
+        }
+
+    def start_hotkey_capture(self) -> dict[str, bool | str]:
+        """Запустить нативный захват новой горячей клавиши."""
+        if not self.hotkey_service:
+            return {"success": False, "error": "Hotkey service not initialized"}
+
+        def capture_callback(hotkey: str | None):
+            if self._window:
+                if not hotkey:
+                    self._window.evaluate_js("window.handleHotkeyCaptureCancelled()")
+                    return
+
+                payload = {
+                    "hotkey": hotkey,
+                    "display": self.hotkey_service.format_hotkey_for_display(hotkey),
+                }
+                self._window.evaluate_js(
+                    f"window.handleHotkeyCaptured({json.dumps(payload, ensure_ascii=False)})"
+                )
+
+        success = self.hotkey_service.start_capture(capture_callback)
+        return {"success": success, "error": self.hotkey_service.last_error}
+
+    def cancel_hotkey_capture(self) -> dict[str, bool | str]:
+        """Отменить нативный захват горячей клавиши."""
+        if not self.hotkey_service:
+            return {"success": False, "error": "Hotkey service not initialized"}
+
+        success = self.hotkey_service.cancel_capture()
+        return {"success": success, "error": self.hotkey_service.last_error}
+
+    def save_captured_hotkey(self) -> dict[str, bool | str]:
+        """Сохранить и зарегистрировать последнюю захваченную горячую клавишу."""
+        if not self.hotkey_service:
+            return {"success": False, "error": "Hotkey service not initialized"}
+
+        hotkey = self.hotkey_service.save_captured_hotkey()
+        if not hotkey:
+            return {"success": False, "error": self.hotkey_service.last_error}
+
+        self.config_manager.set("hotkey_record", hotkey)
+        self.config_manager.save()
+        return {
+            "success": True,
+            "hotkey": hotkey,
+            "display": self.hotkey_service.format_hotkey_for_display(hotkey),
+        }
 
     # --- Управление транскрибацией ---
 
@@ -78,7 +191,7 @@ class AppAPI:
                     print("--- Транскрибация прервана пользователем ---")
                     # Можно отправить в JS событие, что отмена принята
                     if self._window:
-                        self._window.evaluate_js("handleTranscriptionEnd()")
+                        self._window.evaluate_js("appBridge.handleTranscriptionEnd()")
                     return
 
                 # Кодируем сегмент в JSON для безопасной передачи в JS

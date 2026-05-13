@@ -55,7 +55,7 @@ export async function startTranscription() {
     }
   } catch (error) {
     console.error('Ошибка при старте транскрибации:', error);
-    handleTranscriptionEnd();
+    transcriptionEnd();
   }
 }
 
@@ -100,6 +100,8 @@ export function newSegment(segment) {
  */
 export function transcriptionEnd() {
   const mainBtn = getElement('main-action-btn');
+  const isCancelled = mainBtn.dataset.transcriptionCancelled === 'true';
+  delete mainBtn.dataset.transcriptionCancelled;
 
   // При завершении фиксируем финальное затраченное время
   const finalRealTime = formatTime(
@@ -108,7 +110,9 @@ export function transcriptionEnd() {
   const totalFileTime = formatTime(openFileData.duration || 0);
   console.log(openFileData.duration);
 
-  updateProgress(100, totalFileTime, totalFileTime, finalRealTime);
+  if (!isCancelled) {
+    updateProgress(100, totalFileTime, totalFileTime, finalRealTime);
+  }
 
   // Возвращаем кнопку в исходное состояние
   mainBtn.disabled = false;
@@ -118,6 +122,6 @@ export function transcriptionEnd() {
   const currentModel = getElement('model-select').value;
   setStatusReady(currentModel);
 
-  console.log('Транскрибация успешно завершена');
+  console.log(isCancelled ? 'Транскрибация отменена' : 'Транскрибация успешно завершена');
   setInterfaceLocked(false);
 }

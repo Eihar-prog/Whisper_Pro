@@ -15,7 +15,7 @@ export async function loadSettingsUI() {
   const modelSelect = getElement('model-select');
   const langSelect = getElement('lang-select');
   const translateToggle = getElement('translate-toggle');
-  const hotkeyInput = getElement('hotkey-input');
+  const hotkeyDisplay = getElement('hotkey-display');
   const subtitleToggle = getElement('subtitle-toggle');
 
   const config = await pywebview.api.load_config();
@@ -24,7 +24,6 @@ export async function loadSettingsUI() {
     model_size,
     source_language,
     translate_to_english,
-    hotkey_record,
     operation_mode,
     generate_subtitles,
   } = config;
@@ -32,7 +31,10 @@ export async function loadSettingsUI() {
   modelSelect.value = model_size || '';
   langSelect.value = source_language || 'auto';
   translateToggle.checked = translate_to_english || false;
-  hotkeyInput.value = hotkey_record || 'Ctrl+Shift+R';
+
+  const hotkeyInfo = await pywebview.api.get_hotkey_info();
+  hotkeyDisplay.value = hotkeyInfo.display || 'Не назначена';
+
   document.querySelector(
     `input[name="mode"][value="${operation_mode}"]`,
   ).checked = true;

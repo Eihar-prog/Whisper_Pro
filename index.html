@@ -75,12 +75,18 @@
 
           <div class="form-field-group">
             <label class="form-field-label">Горячая клавиша записи</label>
-            <input
-              type="text"
-              id="hotkey-input"
-              placeholder="Напр. Alt+R"
-              class="form-select text-center font-mono tracking-widest"
-            />
+            <div class="hotkey-input-container">
+              <input
+                type="text"
+                id="hotkey-display"
+                class="form-select text-center font-mono tracking-widest"
+                readonly
+                placeholder="Нажмите 'Изменить' для установки комбинации"
+              />
+              <button id="change-hotkey-btn" class="change-hotkey-button">
+                Сменить
+              </button>
+            </div>
           </div>
         </div>
 
@@ -95,23 +101,23 @@
                 value="mic"
                 checked
                 class="hidden"
-                onchange="updateModeUI()"
               />
               <div class="mode-icon">🎤</div>
               <div class="mode-info">
                 <div class="mode-title">Голосовой набор</div>
                 <div class="mode-description">Вставка текста под курсор</div>
+                <!-- <div class="mode-description">
+                  <label class="checkbox-container">
+                    <input type="checkbox" id="auto-insert-toggle" checked />
+                    <span class="checkmark"></span>
+                    Вставлять текст под курсор
+                  </label>
+                </div> -->
               </div>
             </label>
 
             <label id="mode-file" class="work-mode-option">
-              <input
-                type="radio"
-                name="mode"
-                value="file"
-                class="hidden"
-                onchange="updateModeUI()"
-              />
+              <input type="radio" name="mode" value="file" class="hidden" />
               <div class="mode-icon mode-icon-file">📂</div>
               <div class="mode-info">
                 <div class="mode-title">Транскрибация файла</div>

@@ -8,12 +8,12 @@ import './app-bridge.js';
 import { selectFileClick } from './audio/file-handler.js';
 import { startTranscription } from './audio/transcriber.js';
 import { loadSettingsUI } from './config/settings.js';
+import './input/hotkey-manager.js';
 import { copyBtnClick, saveBtnClick } from './output/result-handler.js';
 import {
   cancelBtnClick,
   changeMode,
   changeSubtitles,
-  hotkeyChange,
   selectLangChange,
   selectModelChange,
   toggleTranslateChange,
@@ -60,7 +60,7 @@ function initializeEventListeners() {
   getElement('lang-select').addEventListener('change', selectLangChange);
 
   // Обработчик смены горячих клавиш
-  getElement('hotkey-input').addEventListener('change', hotkeyChange);
+  // getElement('hotkey-input').addEventListener('change', hotkeyChange);
 
   // Обработчик кнопки "Копировать"
   getElement('copy-btn').addEventListener('click', copyBtnClick);

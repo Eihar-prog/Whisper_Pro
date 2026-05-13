@@ -32,7 +32,7 @@ class ConfigManager:
     def load(self) -> dict:
         """Загружает конфиг из файла или возвращает дефолт"""
         if not os.path.exists(self.config_path):
-            print("⚠️ Config file not found. Creating default...")
+            print("Config file not found. Creating default...")
             self.save(self.defaults)
             return self.defaults.copy()
 
@@ -42,7 +42,7 @@ class ConfigManager:
                 # Объединяем с дефолтом, чтобы не потерять новые ключи в будущем
                 return {**self.defaults, **loaded_data}
         except (json.JSONDecodeError, Exception) as e:
-            print(f"❌ Error loading config: {e}. Using defaults.")
+            print(f"Error loading config: {e}. Using defaults.")
             return self.defaults.copy()
 
     # Сохранение настроек
@@ -55,9 +55,9 @@ class ConfigManager:
         try:
             with open(self.config_path, "w", encoding="utf-8") as f:
                 json.dump(data, f, indent=4, ensure_ascii=False)
-            print("✅ Config saved successfully.")
+            print("Config saved successfully.")
         except Exception as e:
-            print(f"❌ Error saving config: {e}")
+            print(f"Error saving config: {e}")
 
     #  Получение настройки
     def get(self, key, default=None):
