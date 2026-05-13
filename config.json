@@ -4,7 +4,7 @@
     "translate_to_english": false,
     "hotkey_record": "right ctrl",
     "operation_mode": "file",
-    "audio_input_dir": "C:\\Users\\dmitb\\Desktop\\WM",
+    "audio_input_dir": "C:\\Users\\dmitb\\Desktop\\WM\\test whisper",
     "text_output_dir": "D:\\Study\\JavaScript\\Bogdan Stachchuk\\Просмотрено\\Введение",
-    "generate_subtitles": true
+    "generate_subtitles": false
 }

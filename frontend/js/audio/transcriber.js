@@ -63,7 +63,7 @@ export async function startTranscription() {
  * Эту функцию вызывает Python через evaluate_js для каждого нового сегмента.
  * @param {Object} segment - Объект с полями {text, start, end, progress}
  */
-window.handleNewSegment = function (segment) {
+export function newSegment(segment) {
   const outputArea = getElement('output-text');
   const isSubtitleMode = getElement('subtitle-toggle').checked;
 
@@ -93,12 +93,12 @@ window.handleNewSegment = function (segment) {
   // Обновляем прогрессбар (используем вашу функцию из progress-bar.js)
   // Whisper дает прогресс на основе времени сегмента
   updateProgress(segment.progress, filePos, fileTotal, realElapsed);
-};
+}
 
 /**
  * Эту функцию вызывает Python, когда генератор сегментов завершил работу.
  */
-window.handleTranscriptionEnd = function () {
+export function transcriptionEnd() {
   const mainBtn = getElement('main-action-btn');
 
   // При завершении фиксируем финальное затраченное время
@@ -120,4 +120,4 @@ window.handleTranscriptionEnd = function () {
 
   console.log('Транскрибация успешно завершена');
   setInterfaceLocked(false);
-};
+}

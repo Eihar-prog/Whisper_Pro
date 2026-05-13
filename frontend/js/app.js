@@ -4,6 +4,7 @@
  * и координацией между различными модулями
  */
 
+import './app-bridge.js';
 import { selectFileClick } from './audio/file-handler.js';
 import { startTranscription } from './audio/transcriber.js';
 import { loadSettingsUI } from './config/settings.js';

@@ -86,11 +86,13 @@ class AppAPI:
 
                 # Вызываем JS-функцию handleNewSegment на фронтенде
                 if self._window:
-                    self._window.evaluate_js(f"handleNewSegment({segment_json})")
+                    self._window.evaluate_js(
+                        f"appBridge.handleNewSegment({segment_json})"
+                    )
 
             # Сообщаем JS, что всё закончилось
             if self._window:
-                self._window.evaluate_js("handleTranscriptionEnd()")
+                self._window.evaluate_js("appBridge.handleTranscriptionEnd()")
 
         except Exception as e:
             print(f"Ошибка в цикле транскрибации: {e}")
