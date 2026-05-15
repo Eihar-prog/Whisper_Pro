@@ -1,10 +1,16 @@
 {
-    "model_size": "base",
+    "model_size": "tiny",
     "source_language": "auto",
     "translate_to_english": false,
     "hotkey_record": "ctrl+1",
     "operation_mode": "file",
-    "audio_input_dir": "C:\\Users\\dmitb\\Desktop\\WM\\test whisper",
-    "text_output_dir": "D:\\Study\\JavaScript\\Bogdan Stachchuk\\Просмотрено\\Введение",
-    "generate_subtitles": false
+    "audio_input_dir": "C:\\Users\\dmitb\\Desktop\\Test",
+    "text_output_dir": "C:\\Users\\dmitb\\Desktop\\Test",
+    "generate_subtitles": false,
+    "include_timestamps": false,
+    "enable_speaker_diarization": false,
+    "pyannote_token": "",
+    "pyannote_model": "pyannote/speaker-diarization-3.1",
+    "pyannote_min_speakers": "1",
+    "pyannote_max_speakers": "3"
 }

@@ -45,7 +45,7 @@ def main():
 
     window.events.closing += api.save_config
 
-    webview.start(debug=True)
+    webview.start(debug=False)
 
 
 if __name__ == "__main__":

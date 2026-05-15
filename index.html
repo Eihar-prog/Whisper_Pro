@@ -149,15 +149,25 @@
 
         <div class="output-panel glass-panel">
           <div class="output-panel-header">
-            <div class="subtitle-controls-container">
+            <div class="result-options-container">
               <span class="result-label">Результат</span>
               <div id="subtitle-container" class="hidden">
                 <label class="checkbox-container">
                   <input type="checkbox" id="subtitle-toggle" />
                   <span class="checkmark"></span>
-                  Создать субтитры (.srt)
+                  Субтитры (.srt)
                 </label>
               </div>
+              <label class="checkbox-container">
+                <input type="checkbox" id="timestamps-toggle" />
+                <span class="checkmark"></span>
+                Таймкоды
+              </label>
+              <label class="checkbox-container">
+                <input type="checkbox" id="speakers-toggle" />
+                <span class="checkmark"></span>
+                Спикеры
+              </label>
             </div>
             <div class="control-buttons-container">
               <button id="copy-btn" class="control-button">
@@ -166,6 +176,56 @@
               <button id="save-btn" class="control-button">💾 Сохранить</button>
             </div>
           </div>
+
+          <div id="speaker-settings-panel" class="speaker-settings-panel hidden">
+            <div class="speaker-settings-grid">
+              <div class="form-field-group">
+                <label class="form-field-label">Hugging Face Token</label>
+                <input
+                  type="password"
+                  id="pyannote-token-input"
+                  class="form-select"
+                  data-config-key="pyannote_token"
+                  autocomplete="off"
+                />
+              </div>
+              <div class="form-field-group">
+                <label class="form-field-label">Модель pyannote</label>
+                <input
+                  type="text"
+                  id="pyannote-model-input"
+                  class="form-select"
+                  data-config-key="pyannote_model"
+                  placeholder="pyannote/speaker-diarization-3.1"
+                />
+              </div>
+              <div class="speaker-count-fields">
+                <div class="form-field-group">
+                  <label class="form-field-label">Мин. спикеров</label>
+                  <input
+                    type="number"
+                    id="pyannote-min-speakers-input"
+                    class="form-select"
+                    data-config-key="pyannote_min_speakers"
+                    min="1"
+                    max="20"
+                  />
+                </div>
+                <div class="form-field-group">
+                  <label class="form-field-label">Макс. спикеров</label>
+                  <input
+                    type="number"
+                    id="pyannote-max-speakers-input"
+                    class="form-select"
+                    data-config-key="pyannote_max_speakers"
+                    min="1"
+                    max="20"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
           <textarea
             id="output-text"
             class="output-textarea custom-scrollbar"

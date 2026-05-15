@@ -108,6 +108,12 @@ const translateToggle = getElement('translate-toggle');
 const hotkeyDisplay = getElement('hotkey-display');
 const changeHotkeyBtn = getElement('change-hotkey-btn');
 const subtitleToggle = getElement('subtitle-toggle');
+const timestampsToggle = getElement('timestamps-toggle');
+const speakersToggle = getElement('speakers-toggle');
+const pyannoteTokenInput = getElement('pyannote-token-input');
+const pyannoteModelInput = getElement('pyannote-model-input');
+const pyannoteMinSpeakersInput = getElement('pyannote-min-speakers-input');
+const pyannoteMaxSpeakersInput = getElement('pyannote-max-speakers-input');
 
 /**
  * Действие при выборе модели whisper
@@ -164,6 +170,31 @@ export async function changeSubtitles(event) {
 }
 
 /**
+ * Включаем/выключаем таймкоды в тексте результата
+ */
+export async function changeTimestamps(event) {
+  await updateConfig('include_timestamps', event.target.checked);
+}
+
+/**
+ * Включаем/выключаем заготовку разделения по спикерам
+ */
+export async function changeSpeakers(event) {
+  const isEnabled = event.target.checked;
+  const speakerSettingsPanel = getElement('speaker-settings-panel');
+
+  toggleClass(speakerSettingsPanel, 'hidden', !isEnabled);
+  await updateConfig('enable_speaker_diarization', isEnabled);
+}
+
+/**
+ * Сохраняем локальные настройки будущей интеграции pyannote
+ */
+export async function changePyannoteSetting(event) {
+  await updateConfig(event.target.dataset.configKey, event.target.value);
+}
+
+/**
  * Блокирует или разблокирует элементы управления во время транскрибации
  * @param {boolean} locked - true если идет процесс, false если готов
  */
@@ -173,6 +204,12 @@ export function setInterfaceLocked(locked) {
     langSelect,
     translateToggle,
     subtitleToggle,
+    timestampsToggle,
+    speakersToggle,
+    pyannoteTokenInput,
+    pyannoteModelInput,
+    pyannoteMinSpeakersInput,
+    pyannoteMaxSpeakersInput,
     hotkeyDisplay,
     changeHotkeyBtn,
     getElement('copy-btn'),

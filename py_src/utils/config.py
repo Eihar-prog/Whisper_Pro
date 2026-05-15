@@ -24,6 +24,12 @@ class ConfigManager:
             "audio_input_dir": "",
             "text_output_dir": "",
             "generate_subtitles": True,
+            "include_timestamps": False,
+            "enable_speaker_diarization": False,
+            "pyannote_token": "",
+            "pyannote_model": "pyannote/speaker-diarization-3.1",
+            "pyannote_min_speakers": "",
+            "pyannote_max_speakers": "",
         }
 
         self.data = self.load()

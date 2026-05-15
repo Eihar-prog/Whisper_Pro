@@ -13,7 +13,10 @@ import { copyBtnClick, saveBtnClick } from './output/result-handler.js';
 import {
   cancelBtnClick,
   changeMode,
+  changePyannoteSetting,
+  changeSpeakers,
   changeSubtitles,
+  changeTimestamps,
   selectLangChange,
   selectModelChange,
   toggleTranslateChange,
@@ -38,6 +41,18 @@ function initializeEventListeners() {
 
   // Обработчик включения/выключения субтитров
   getElement('subtitle-toggle').addEventListener('change', changeSubtitles);
+
+  // Обработчики настроек результата
+  getElement('timestamps-toggle').addEventListener('change', changeTimestamps);
+  getElement('speakers-toggle').addEventListener('change', changeSpeakers);
+  [
+    'pyannote-token-input',
+    'pyannote-model-input',
+    'pyannote-min-speakers-input',
+    'pyannote-max-speakers-input',
+  ].forEach((id) => {
+    getElement(id).addEventListener('change', changePyannoteSetting);
+  });
 
   // Обработчик клика по кнопке выбора файла
   getElement('select-file-btn').addEventListener('click', selectFileClick);
